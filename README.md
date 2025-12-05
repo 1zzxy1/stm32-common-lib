@@ -4,6 +4,15 @@
 
 ## 库列表
 
+### 📌 标识说明
+
+- ✅ **通用模块** - 无硬件依赖，可直接使用
+- ⚙️ **硬件依赖** - 需要根据实际硬件修改GPIO/外设配置
+- 📦 **第三方库** - 开源第三方组件
+- 🔧 **应用模块** - 需要特定库组合或项目配置
+
+### ✅ 通用算法模块
+
 | 库名 | 说明 | 依赖 |
 |------|------|------|
 | [pid](./pid) | PID控制器，支持位置式和增量式算法 | 无 |
@@ -11,61 +20,59 @@
 | [scheduler](./scheduler) | 任务调度器，基于时间片的非抢占式调度 | 无 |
 | [kalman](./kalman) | 卡尔曼滤波器，一维信号滤波 | 无 |
 | [bit_array](./bit_array) | 位数组操作库，Header-only | 无 |
-| [ebtn](./ebtn) | 按键驱动库，支持组合键和多击检测 | bit_array |
-| [motor](./motor) | 电机驱动库，支持H桥驱动芯片 | STM32 HAL |
-| [encoder](./encoder) | 编码器驱动库，支持速度测量和位置累计 | STM32 HAL |
-| [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 HAL |
 | [usart_pack](./usart_pack) | 串口数据包协议，支持多类型打包/解包 | 无 |
 | [fft](./fft) | FFT频谱分析，支持THD/SINAD测量 | CMSIS-DSP |
+
+### ⚙️ 硬件驱动模块（需修改配置）
+
+| 库名 | 说明 | 依赖 | 配置要求 |
+|------|------|------|----------|
+| [ebtn](./ebtn) | 按键驱动库，支持组合键和多击检测 | bit_array | 无硬件依赖 |
+| [motor](./motor) | 电机驱动库，支持H桥驱动芯片 | STM32 HAL | 修改PWM定时器配置 |
+| [encoder](./encoder) | 编码器驱动库，支持速度测量和位置累计 | STM32 HAL | 修改定时器配置 |
+| [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 HAL | 修改SPI和GPIO配置 |
+| [spi_flash](./spi_flash) | ⚠️ GD25Qxx SPI Flash驱动 | STM32 HAL | **必须修改CS引脚和SPI句柄** |
+| [oled](./oled) | ⚠️ SSD1306 OLED显示驱动（基础） | STM32 HAL | **必须修改I2C/SPI接口** |
+| [waveform_gen](./waveform_gen) | ⚠️ 波形发生器（DAC+DMA+Timer） | STM32 HAL | **必须修改DAC/Timer/DMA句柄** |
+
+### 📦 第三方开源库
+
+| 库名 | 说明 | 依赖 | 注意事项 |
+|------|------|------|----------|
+| [lfs](./lfs) | LittleFS嵌入式文件系统 | spi_flash | 需实现硬件读写接口 |
+| [u8g2](./u8g2) | 功能强大的单色图形库 | I2C/SPI | **字体库37MB，需裁剪** |
+| [WouoUI](./WouoUI) | OLED菜单UI框架 | u8g2, ebtn | 需要u8g2和按键驱动 |
+
+### 🔧 应用层模块（特定场景）
+
+| 库名 | 说明 | 依赖 | 使用场景 |
+|------|------|------|----------|
+| [shell](./shell) | 🔧 LittleFS命令行Shell | lfs, spi_flash | 文件系统调试 |
+| [waveform_analyzer](./waveform_analyzer) | 🔧 波形分析器（FFT+谐波） | fft, CMSIS-DSP | **需实现采样率函数** |
 
 ## 目录结构
 
 ```
 stm32通用库/
-├── pid/                    # PID控制库
-│   ├── pid.c
-│   ├── pid.h
-│   └── README.md
-├── ringbuffer/             # 环形缓冲区
-│   ├── ringbuffer.c
-│   ├── ringbuffer.h
-│   └── README.md
-├── scheduler/              # 任务调度器
-│   ├── scheduler.c
-│   ├── scheduler.h
-│   └── README.md
-├── kalman/                 # 卡尔曼滤波器
-│   ├── kalman.c
-│   ├── kalman.h
-│   └── README.md
-├── bit_array/              # 位数组库
-│   ├── bit_array.h
-│   └── README.md
-├── ebtn/                   # 按键驱动库
-│   ├── ebtn.c
-│   ├── ebtn.h
-│   ├── bit_array.h
-│   └── README.md
-├── motor/                  # 电机驱动库
-│   ├── motor_driver.c
-│   ├── motor_driver.h
-│   └── README.md
-├── encoder/                # 编码器驱动库
-│   ├── encoder_driver.c
-│   ├── encoder_driver.h
-│   └── README.md
-├── ad9833/                 # AD9833 DDS驱动库
-│   ├── ad9833.c
-│   ├── ad9833.h
-│   └── README.md
-├── usart_pack/             # 串口数据包协议
-│   ├── usart_pack.c
-│   ├── usart_pack.h
-│   └── README.md
-├── fft/                    # FFT频谱分析
-│   ├── fft.c
-│   ├── fft.h
-│   └── README.md
+├── pid/                    # ✅ PID控制库
+├── ringbuffer/             # ✅ 环形缓冲区
+├── scheduler/              # ✅ 任务调度器
+├── kalman/                 # ✅ 卡尔曼滤波器
+├── bit_array/              # ✅ 位数组库
+├── ebtn/                   # ⚙️ 按键驱动库
+├── usart_pack/             # ✅ 串口数据包协议
+├── fft/                    # ✅ FFT频谱分析
+├── motor/                  # ⚙️ 电机驱动库
+├── encoder/                # ⚙️ 编码器驱动库
+├── ad9833/                 # ⚙️ AD9833 DDS驱动
+├── spi_flash/              # ⚠️ GD25Qxx SPI Flash驱动
+├── oled/                   # ⚠️ SSD1306 OLED驱动
+├── waveform_gen/           # ⚠️ 波形发生器
+├── lfs/                    # 📦 LittleFS文件系统
+├── u8g2/                   # 📦 U8g2图形库（37MB！）
+├── WouoUI/                 # 📦 WouoUI菜单框架
+├── shell/                  # 🔧 LittleFS Shell
+├── waveform_analyzer/      # 🔧 波形分析器
 ├── LICENSE
 └── README.md
 ```
