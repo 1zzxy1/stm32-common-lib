@@ -9,10 +9,12 @@
 | [pid](./pid) | PID控制器，支持位置式和增量式算法 | 无 |
 | [ringbuffer](./ringbuffer) | 环形缓冲区，适用于串口等数据收发 | 无 |
 | [scheduler](./scheduler) | 任务调度器，基于时间片的非抢占式调度 | 无 |
+| [kalman](./kalman) | 卡尔曼滤波器，一维信号滤波 | 无 |
 | [bit_array](./bit_array) | 位数组操作库，Header-only | 无 |
 | [ebtn](./ebtn) | 按键驱动库，支持组合键和多击检测 | bit_array |
 | [motor](./motor) | 电机驱动库，支持H桥驱动芯片 | STM32 HAL |
 | [encoder](./encoder) | 编码器驱动库，支持速度测量和位置累计 | STM32 HAL |
+| [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 HAL |
 
 ## 目录结构
 
@@ -30,6 +32,10 @@ stm32通用库/
 │   ├── scheduler.c
 │   ├── scheduler.h
 │   └── README.md
+├── kalman/                 # 卡尔曼滤波器
+│   ├── kalman.c
+│   ├── kalman.h
+│   └── README.md
 ├── bit_array/              # 位数组库
 │   ├── bit_array.h
 │   └── README.md
@@ -45,6 +51,10 @@ stm32通用库/
 ├── encoder/                # 编码器驱动库
 │   ├── encoder_driver.c
 │   ├── encoder_driver.h
+│   └── README.md
+├── ad9833/                 # AD9833 DDS驱动库
+│   ├── ad9833.c
+│   ├── ad9833.h
 │   └── README.md
 ├── LICENSE
 └── README.md
