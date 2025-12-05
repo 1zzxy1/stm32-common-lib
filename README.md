@@ -15,6 +15,7 @@
 | [motor](./motor) | 电机驱动库，支持H桥驱动芯片 | STM32 HAL |
 | [encoder](./encoder) | 编码器驱动库，支持速度测量和位置累计 | STM32 HAL |
 | [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 HAL |
+| [usart_pack](./usart_pack) | 串口数据包协议，支持多类型打包/解包 | 无 |
 
 ## 目录结构
 
@@ -55,6 +56,10 @@ stm32通用库/
 ├── ad9833/                 # AD9833 DDS驱动库
 │   ├── ad9833.c
 │   ├── ad9833.h
+│   └── README.md
+├── usart_pack/             # 串口数据包协议
+│   ├── usart_pack.c
+│   ├── usart_pack.h
 │   └── README.md
 ├── LICENSE
 └── README.md
