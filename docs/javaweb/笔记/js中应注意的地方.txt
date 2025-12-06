@@ -1,0 +1,60 @@
+1.文件头加入以下几行，避免修改页面后，浏览器仍运行缓存中的页面
+
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache"> 
+
+即使加上，在浏览器刷新页面后也要查看一下源码，有时也需要稍等一下再重新
+做刷新才能看到修改后的页面上的js代码
+
+2.form1.控件名.属性   这种用法不好，比如设置innerHTML属性时有的控件需要把form1去掉才好用.(否则chrome按f12进入调试模式下可看到报错找不到属性，网页里的js错误可以进入chrome里的调试模式下看到)
+form1.控件名.属性 推荐全部改用  var c=document.getElementById("控件id")，无论设置或获取属性，都用c.xxxxx进行设置或获取
+
+对文本框加上onchange事件的处理，可以立即对用户输入进行反馈
+
+3.提交或跳转前加一个询问框   confirm("真要离开本页面吗？")，返回真假
+
+4.客户端校验可减轻服务器端压力，使用户快速得到响应，但并不完全可信，仍需要再服务器端做校验（chrome调试端直接改函数，改界面）
+
+直接改函数如下
+check=function(){
+   return true;
+}
+
+5.可以使用DIV来在js中动态创建和修改页面上的控件元素
+仿照3.12功能
+
+增加全局变量如下
+var strbegin="<table width='200' border='1'>";
+var content="";
+var strend="</table>";
+//新增一个按钮，按钮事件如下
+function ff1(){
+  //控件变量如定义全局变量，需在window.onload中获取
+	var d=document.getElementById("dd1");
+	var user=document.getElementById("user");
+	var pass=document.getElementById("pass");
+	
+	content+="<tr><td>"+user.value+"</td>"+"<td>"+pass.value+"</td></tr>";
+	d.innerHTML=strbegin+content+strend;
+	
+	
+}
+
+
+6.复习setInterval(fun(x),1000)用法，在页面上添加一个时钟，并设置较大的显示字体。注意函数没有参数时用setInterval(fun,1000)，fun后不要有()
+
+window.onload=function(){
+	
+	var tid=setInterval(f,1000);
+}
+
+function f(){
+	var d=new Date();
+	var str=d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+	var mytime=document.getElementById("mytime");//mytime是div的id
+	mytime.innerHTML="<font color='#0000ff' size='25'>"+str+"</font>";
+}
+
+
+

@@ -24,13 +24,13 @@
 | [kalman](./kalman) | 卡尔曼滤波器，一维信号滤波 | 通用 | 无 | 忘了哪来的了 |
 | [bit_array](./bit_array) | 位数组操作库，Header-only | 通用 | 无 | 忘了哪来的了 |
 | [usart_pack](./usart_pack) | 串口数据包协议，支持多类型打包/解包 | 通用 | 无 | 忘了哪来的了 |
-| [fft](./fft) | FFT频谱分析，支持THD/SINAD测量 | STM32 | CMSIS-DSP | 玩信号时用过 |
+| [fft](./fft) | FFT频谱分析，支持THD/SINAD测量 | STM32 | CMSIS-DSP | 电赛时用过 |
 | [imu_fusion](./imu_fusion) | IMU九轴融合算法（Madgwick+Kalman） | 通用 | wp_math(可选) | |
 | [wp_math](./wp_math) | 高性能数学库，100+优化函数（3~10倍提速） | 通用 | 无 | |
 | [multi_timer](./multi_timer) | 软件定时器管理器（无需RTOS） | 通用 | 无 | 网友那拿的 |
 | [lq_balance](./lq_balance) | 平衡车控制算法（双闭环PID） | STC16 | LQ系列 | 网友那拿的 |
 | [math_lib](./math_lib) | 数学工具函数（map/Clamp） | 通用 | 无 | 网友那拿的 |
-| [ano_dt](./ano_dt) | 匿名地面站通信协议 | 通用 | 串口 | 网友那拿的 |
+| [ano_dt](./ano_dt) | 匿名地面站通信协议 | 通用 | 串口 | 学长圣遗物 |
 
 ### ⚙️ 硬件驱动模块（需修改配置）
 
@@ -54,7 +54,7 @@
 | [emm_v5](./emm_v5) | Emm_V5步进电机串口协议驱动 | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
 | [tb6612](./tb6612) | TB6612FNG双路DC电机驱动 | STM32 | STM32 HAL | **必须修改PWM和GPIO配置** | 网友那拿的 |
 | [a4950](./a4950) | A4950双路DC电机驱动 | STM32 | STM32 HAL | **必须修改PWM和GPIO配置** | 网友那拿的 |
-| [lq_motorservo](./lq_motorservo) | 龙邱电机舵机驱动（PWM） | STC16 | LQ_PWM | **必须修改PWM接口** | 网友那拿的 |
+| [lq_motorservo](./lq_motorservo) | 龙邱电机舵机驱动（PWM） | STC16 | LQ_PWM | **必须修改PWM接口** | 学长圣遗物 |
 
 #### 其他外设
 
@@ -64,7 +64,7 @@
 | [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 | STM32 HAL | 修改SPI和GPIO配置 | 网友那拿的 |
 | [spi_flash](./spi_flash) | ⚠️ GD25Qxx SPI Flash驱动 | STM32 | STM32 HAL | **必须修改CS引脚和SPI句柄** | 网友那拿的 |
 | [oled](./oled) | ⚠️ SSD1306 OLED显示驱动（基础） | STM32 | STM32 HAL | **必须修改I2C/SPI接口** | 网友那拿的 |
-| [lq_oled096](./lq_oled096) | 龙邱OLED显示驱动（功能完整） | STC16 | LQ_I2C | **必须修改I2C/SPI接口** | 网友那拿的 |
+| [lq_oled096](./lq_oled096) | 龙邱OLED显示驱动（功能完整） | STC16 | LQ_I2C | **必须修改I2C/SPI接口** | 学长圣遗物 |
 | [waveform_gen](./waveform_gen) | ⚠️ 波形发生器（DAC+DMA+Timer） | STM32 | STM32 HAL | **必须修改DAC/Timer/DMA句柄** | 网友那拿的 |
 | [maixcam](./maixcam) | MaixCam视觉传感器串口协议解析 | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
 | [lq_softi2c](./lq_softi2c) | 软件I2C通信库 | 通用 | GPIO | 修改GPIO定义 | 网友那拿的 |
@@ -82,7 +82,7 @@
 | 库名 | 说明 | 平台 | 依赖 | 使用场景 | 来源 |
 |------|------|------|------|----------|------|
 | [shell](./shell) | 🔧 LittleFS命令行Shell | STM32 | lfs, spi_flash | 文件系统调试 | |
-| [waveform_analyzer](./waveform_analyzer) | 🔧 波形分析器（FFT+谐波） | STM32 | fft, CMSIS-DSP | **需实现采样率函数** | 玩信号时用过 |
+| [waveform_analyzer](./waveform_analyzer) | 🔧 波形分析器（FFT+谐波） | STM32 | fft, CMSIS-DSP | **需实现采样率函数** | 电赛时用过 |
 | [pid_tuner](./pid_tuner) | 🔧 串口命令行PID调参工具 | STM32 | usart_pack | 实时PID参数调优 | 网友那拿的 |
 | [lcd_menu](./lcd_menu) | 🔧 按键菜单系统 | STM32 | oled, ebtn | 参数调节、功能选择 | 网友那拿的 |
 
@@ -99,14 +99,35 @@
 
 | 库名 | 说明 | 平台 | 依赖 | 适用场景 | 来源 |
 |------|------|------|------|----------|------|
-| [linux_tcp](./linux_tcp) | TCP服务器客户端（Qt） | Linux/PC | Qt5/Qt6 | 网络通信、物联网、远程控制 | 网友那拿的 |
+| [linux_tcp](./linux_tcp) | TCP服务器客户端（Qt） | Linux/PC | Qt5/Qt6 | 网络通信、物联网、远程控制 | 学长圣遗物 |
 
 #### 系统编程
 
 | 库名 | 说明 | 平台 | 依赖 | 适用场景 | 来源 |
 |------|------|------|------|----------|------|
-| [linux_thread](./linux_thread) | Qt线程编程示例 | Linux/PC | Qt5/Qt6 | 多线程开发、并发编程 | 网友那拿的 |
-| [makefile_example](./makefile_example) | Makefile使用示例 | Linux/PC | GNU Make, GCC | 项目构建、自动化编译 | 网友那拿的 |
+| [linux_thread](./linux_thread) | Qt线程编程示例 | Linux/PC | Qt5/Qt6 | 多线程开发、并发编程 | 学长圣遗物 |
+| [makefile_example](./makefile_example) | Makefile使用示例 | Linux/PC | GNU Make, GCC | 项目构建、自动化编译 | 学长圣遗物 |
+
+### 📚 文档资料（docs/）
+
+| 目录 | 说明 | 内容 | 来源 |
+|------|------|------|------|
+| [docs/javaweb](./docs/javaweb) | JavaWeb开发文档 | PDF教材、开发笔记、技术文档 | 学长圣遗物 |
+| [docs/linux_qt](./docs/linux_qt) | Linux与Qt开发文档 | Qt编程教材、实验指导、技术笔记 | 学长圣遗物 |
+| [docs/linux_network](./docs/linux_network) | Linux网络管理文档 | 网络服务配置、系统管理教程 | 学长圣遗物 |
+| [docs/pcb](./docs/pcb) | PCB相关资料 | 原理图、设计参考 | 学长圣遗物 |
+
+### 💡 示例代码（examples/）
+
+| 目录 | 说明 | 内容 | 来源 |
+|------|------|------|------|
+| [examples/javaweb](./examples/javaweb) | JavaWeb代码示例 | Session/Cookie、WebSocket、Excel操作、验证码等 | 学长圣遗物 |
+
+### ⚙️ 配置文件（configs/）
+
+| 目录 | 说明 | 内容 | 来源 |
+|------|------|------|------|
+| [configs/dev_tools](./configs/dev_tools) | 开发工具配置 | Claude Code、MCP、Serena、Spec Workflow配置 | 学长圣遗物 |
 
 ## 目录结构
 
@@ -161,25 +182,35 @@ stm32通用库/
 ├── simple_uart/            # Python UART管理库
 ├── perspective_transform/  # 透视变换工具
 │
+├── # 📚 文档资料
+├── docs/
+│   ├── javaweb/            # JavaWeb开发文档
+│   ├── linux_qt/           # Linux与Qt开发文档
+│   ├── linux_network/      # Linux网络管理文档
+│   └── pcb/                # PCB相关资料
+│
+├── # 💡 示例代码
+├── examples/
+│   └── javaweb/            # JavaWeb代码示例
+│
+├── # ⚙️ 配置文件
+├── configs/
+│   └── dev_tools/          # 开发工具配置（Claude Code、MCP等）
+│
 ├── LICENSE
 └── README.md
 ```
 
-## 使用方法
+## ⚠️ 重要提示
 
-1. 将需要的库文件夹复制到你的工程目录
-2. 在IDE中添加源文件和头文件路径
-3. 参考各库的README文档进行配置和使用
-
-### Keil MDK
-
-1. 将库文件添加到工程
-2. 在 Options -> C/C++ -> Include Paths 中添加头文件路径
-
-### STM32CubeIDE
-
-1. 将库文件夹复制到工程目录
-2. 右键工程 -> Properties -> C/C++ Build -> Settings -> Include paths
+> **本仓库为个人学习和开发过程中整理的代码库，代码质量和文档仅供参考。**
+>
+> - 代码来源于个人项目、网友分享和开源社区
+> - 质量参差不齐，未经充分测试
+> - **不保证生产环境可用性**
+> - 使用前请务必充分测试和验证
+> - 硬件依赖模块需根据实际硬件修改配置
+> - 如遇问题请自行调试，作者不承担任何责任
 
 ## 许可证
 
@@ -210,21 +241,24 @@ stm32通用库/
 
 ### 📊 库统计
 
-- **总模块数**：45个（持续增加中）
+- **代码模块**：45个（持续增加中）
+- **文档资料**：4类（JavaWeb、LinuxQt、Linux网络、PCB）
+- **示例代码**：JavaWeb开发示例（10+）
+- **配置文件**：AI开发工具配置
 - **支持平台**：
   - 🔸 STM32（HAL库）
   - 🔸 STC16（龙邱平台）
   - 🔸 Linux/PC（Qt/C）
   - 🔸 Python（上位机工具）
+  - 🔸 JavaWeb（J2EE）
   - 🔸 通用（纯算法，跨平台）
 - **覆盖领域**：
-  - 控制算法（PID、卡尔曼滤波、平衡车）
-  - 传感器驱动（IMU、编码器、灰度）
-  - 电机驱动（步进、直流、舵机）
-  - 通信协议（串口、I2C、SPI、TCP）
-  - 显示驱动（OLED、LCD）
-  - 系统编程（线程、文件系统）
-  - 工具库（数学、位操作、环形缓冲）
+  - **嵌入式开发**：控制算法、传感器驱动、电机驱动、通信协议、显示驱动
+  - **Linux/PC开发**：网络编程、多线程、系统编程、构建工具
+  - **JavaWeb开发**：Session/Cookie、Ajax、WebSocket、数据库、文件上传
+  - **硬件设计**：PCB原理图、电路设计参考
+  - **工具配置**：AI辅助开发工具（Claude Code、MCP）
+  - **学习资料**：PDF教材、技术笔记、实验指导
 
 ### 💡 使用建议
 
@@ -257,6 +291,9 @@ stm32通用库/
 
 ---
 
-**最后更新**：2025-12-06
-**模块数量**：45个
-**代码行数**：约30000+行
+**最后更新**：2025-12-07
+**代码模块**：45个
+**文档资料**：4类（JavaWeb、LinuxQt、Linux网络、PCB）
+**示例代码**：JavaWeb开发示例10+
+**配置文件**：AI开发工具配置
+**代码行数**：约30000+行（不含文档）

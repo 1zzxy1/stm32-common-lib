@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<HTML>
+	<HEAD>
+		<title>upMoreFile</title>
+		<meta content="Microsoft Visual Studio 7.0" name="GENERATOR">
+		<meta content="C#" name="CODE_LANGUAGE">
+		<meta content="JavaScript" name="vs_defaultClientScript">
+		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
+		<script language="JavaScript">
+    function addFileControl()
+    {
+    	var str = '<INPUT type="file" NAME="File">'
+    	document.getElementById('FileCollection').insertAdjacentHTML("beforeEnd",str)
+    }
+		</script>
+	    <style type="text/css">
+            .style1
+            {
+                font-size: large;
+                color: #990000;
+            }
+        </style>
+	</HEAD>
+	<body MS_POSITIONING="GridLayout">
+    请上传war文件<br />
+		<form id="upMoreFile1" method="post" encType="multipart/form-data" runat="server">
+			
+			<P id="FileCollection"><INPUT type="file" name="File">
+			</P>
+  <input type="BUTTON" value="add" name="test" OnClick="addFileControl()">
+			</form>
+	</body>
+</HTML>

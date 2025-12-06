@@ -1,0 +1,18 @@
+安装jdk1.7（其他版本路径要按实际情况）
+
+我的电脑-属性-高级系统设置-环境变量（系统变量）
+
+增加环境变量 (以实际路径为准)
+JAVA_HOME=C:\Program Files\Java\jdk1.7.0_80
+修改环境变量
+Path=原值;%JAVA_HOME%\bin;%JAVA_HOME%\jre\bin
+增加环境变量
+CLASSPATH=.;%JAVA_HOME%\lib;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar
+
+命令行编译执行 
+   javac Xxx.java
+   java  Xxx
+    如果能编译成class文件但执行时提示找不到主类，请检查classpath是否正确 
+    如果命令行能正确编译执行，但eclipse只能编译，执行仍提示找不到主类，
+鼠标右键 项目-属性-JavaCompiler 指定正确的java版本号或不勾选第一个复选框
+    import已有项目时，一般需要重新指定java library. 右键 项目-属性-Java buildpath-libraries 删除原来错误的，添加当前默认的（add library-jre system library）

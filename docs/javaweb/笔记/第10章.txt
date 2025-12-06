@@ -1,0 +1,252 @@
+第10章 java web的数据库操作
+
+本章可以参考上学期“面向对象程序设计”第20章数据库部分的内容。相应Jdbc jar包已经在源码的lib目录下，也可以改用新版本的jar包。tomcat里，用到的第三方jar包也要放到当前web应用的lib目录下。
+
+使用mysql，适合书上源码的是在安装mysql使选用gbk编码方式，也可以照下文说明在安装后进行配置修改。数据库和表可以照书上的内容自己建立，也可以导入源码里的db_database10.sql来创建。
+
+mysql如何修改root用户的密码(可能受版本等影响，不一定通用)
+方法1： 用SET PASSWORD命令 
+首先登录MySQL。 
+格式：mysql> set password for 用户名@localhost = password('新密码'); 
+例子：mysql> set password for root@localhost = password('123'); 
+
+方法2：用mysqladmin 
+格式：mysqladmin -u用户名 -p旧密码 password 新密码 
+例子：mysqladmin -uroot -p123456 password 123 
+
+方法3：用UPDATE直接编辑user表 
+首先登录MySQL。 
+mysql> use mysql; 
+mysql> update user set password=password('123') where user='root' and host='localhost'; 
+mysql> flush privileges; 
+
+方法4：在忘记root密码的时候，可以这样 
+以windows为例： 
+1. 关闭正在运行的MySQL服务。 
+2. 打开DOS窗口，转到mysql\bin目录。 
+3. 输入mysqld --skip-grant-tables 回车。--skip-grant-tables 的意思是启动MySQL服务的时候跳过权限表认证。 
+4. 再开一个DOS窗口（因为刚才那个DOS窗口已经不能动了），转到mysql\bin目录。 
+5. 输入mysql回车，如果成功，将出现MySQL提示符 >。 
+6. 连接权限数据库： use mysql; 。 
+6. 改密码：update user set password=password("123") where user="root";（别忘了最后加分号） 。 
+7. 刷新权限（必须步骤）：flush privileges;　。 
+8. 退出 quit。 
+9. 注销系统，再进入，使用用户名root和刚才设置的新密码123登录。
+
+
+
+mysql导入导出sql文件方法和命令如下：
+
+window下
+
+1.导出整个数据库
+mysqldump -u 用户名 -p 数据库名 > 导出的文件名
+mysqldump -u dbuser -p dbname > dbname.sql
+
+2.导出一个表
+mysqldump -u 用户名 -p 数据库名 表名> 导出的文件名
+mysqldump -u dbuser -p dbname users> dbname_users.sql
+
+3.导出一个数据库结构
+mysqldump -u dbuser -p -d --add-drop-table dbname >d:/dbname_db.sql
+-d 没有数据 --add-drop-table 在每个create语句之前增加一个drop table
+
+4.导入数据库
+常用source 命令
+进入mysql数据库控制台，如
+mysql -u root -p
+mysql>use 数据库     (如果建库也在.sql文件里就不用这句)
+然后使用source命令，后面参数为脚本文件(如这里用到的.sql)
+mysql>source d:/dbname.sql
+
+数据库在gbk或utf8编码下一般不需要在保存和读取时做转换，如果在latin1(即iso8859_1)编码则需要编码转换。
+
+mysql数据库有时需要设置语言编码（如果初始安装时选择了latin1），这里以gbk为例(书上的源码如果mysql是latin1编码则保存时会丢失中文信息，除非修改源码在保存和提取时做gbk和iso8859-1互转；如果mysql是utf8编码则程序里没有问题，但在mysql环境里是乱码[保存和提取时做gbk和utf8互转?,该问题有可能与windows系统默认编码是gbk有关,建议windows下mysql安装时或在配置文件里设置为gbk，linux下mysql设置成utf8]；只有mysql是gbk编码时，源码不用改动，且程序和mysql里都能正常显示中文)，两种方法如下：(可以只看第一种)
+
+1.直接修改配置文件（我用的这种，mysql的安装目录下my.ini里只有两项和编码有关，改成gbk）
+MySql的配置文件Windows下一般在系统目录下或者在MySql的安装目录下名字叫my.ini，Linux下一般是/etc/my.cnf。
+注意改动配置文件后要重启mysql服务。Windows下命令如下：
+
+net stop mysql
+net start mysql
+
+进入mysql后 执行 ：show variables like "%character%";查看修改结果如下即可
+| character_set_client     | gbk
+           |
+| character_set_connection | gbk
+           |
+| character_set_database   | gbk
+           |
+| character_set_filesystem | binary
+           |
+| character_set_results    | gbk
+           |
+| character_set_server     | gbk
+           |
+| character_set_system     | utf8
+
+2.用mysql命令进行修改。(把编码改成gbk，这个似乎有的选项不能改，建议上一种)
+进入mysql后 执行 ：show variables like "%character%";
+显示结果应该类似如下：
+
+| character_set_client | utf8 |
+
+| character_set_connection | utf8 |
+
+| character_set_database | utf8 |
+
+| character_set_results | utf8 |
+
+| character_set_server | utf8 |
+
+| character_set_system | utf8 |
+
+| character_sets_dir | /usr/share/mysql/charsets/ |
+
+ 
+如果编码不是gbk的，可使用mysql命令设置：
+
+set character_set_client = gbk;
+
+set character_set_server = gbk;
+
+set character_set_connection = gbk;
+
+.......
+
+另外：
+
+建立数据库时可以使用以下命令设置数据库编码：
+
+create database app_relation character set gbk; 
+
+use app_relation;
+
+source app_relation.sql;
+
+修改数据库编码的命令为：
+
+alter database app_relation character set gbk; 
+
+
+
+在Mysql里使用source命令从sql文件建立数据后，可以导入代码10.2和10.3，一个用于向数据表里添加，一个用于显示数据表的内容。
+ 
+注意源码里要把数据库的用户名和密码修改成自己的。
+这些例子包括后续例子都是通过servlet来做数据库的增删改查，显示数据是在jsp里，由servlet做转发，在jsp里把servlet里获得的数据显示出来。
+
+
+多次运行书上源码，有可能会有jdbc jar 包频繁装载出现不能运行的问题。此时可以在调试窗口的server下把调试项目删除，然后重新运行该项目就可以了。注意是下方调试窗口servers栏的，别错删源码。
+
+
+10.2和10.3过滤servlet里设置语句重复了，改成
+request.setCharacterEncoding("UTF-8");   //这句在接收参数时必须有,否则接收的中文乱码
+response.setCharacterEncoding("UTF-8");	 //这句在本例里似乎有没有没影响
+
+
+
+代码10.4是列出数据并针对某行进行修改，注意在这两个servlet代码里都要把数据库的用户名和密码修改成自己的。这里用了html里的hidden控件保存id。这个例子可以改成把原值显示在文本框里再修改（加个value属性），并且扩展成同时修改多个字段。
+
+以上用法比较简单，一次只能改一行记录。
+这个例子也可以改成批量提交多条记录，把form标签和submit按钮拿到表格(循环)外面就可以处理多行记录，
+如
+<form action="UpdateServlet" method="post">
+	<table align="center" width="500" border="1" height="170" bordercolor="white" bgcolor="black" cellpadding="1" cellspacing="1">
+	。。。。。。。。
+						
+	<input type="hidden" name="id" value="<%=book.getId()%>">
+	<input type="text" name="Count" value="<%=book.getBookCount() %>">
+	<input type="text" name="Price" value="<%=book.getPrice() %>">
+							
+	。。。。。。。。
+	</table>
+	<input type="submit" value="修　改">
+</form>
+
+此时抓包post数据形如以下（多次循环，因此控件重名，即每个参数有多个值）
+id=6&Count=7&Price=22&id=7&Count=234&Price=59.0&id=8&Count=120&Price=69.0&id=9&Count=2&Price=1.0
+
+这种情况可以在数据接收页通过数组获取出来所有数据（这样传递的参数被当作是数组来提取值）
+public class UpdateServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String[] id=request.getParameterValues("id");
+		String[] price=request.getParameterValues("Price");
+		PrintWriter out=response.getWriter();
+		for(String a:id)
+			out.print(a);
+		for(String a:price)
+			out.println(a);
+	}
+
+}
+
+注意参数是数组，要使用形如String[] id=request.getParameterValues("id");，如果单个参数则使用String id=request.getParameter("id");
+
+只要能提取出form里提交过来的数据，就可以形成多行数据进行多行更新（比如批量录入成绩,就是接收到多个id及其对应的多个更改后的值，要在循环里更新多条记录）。
+
+提交的也可能是一列复选框的值，这样可以进行批量删除。form里加个checkbox，则通过循环形成复选框列，form里输入元素如下
+<input type="hidden" name="id" value="<%=book.getId()%>">
+<input type="text" name="Count" value="<%=book.getBookCount() %>">
+<input type="text" name="Price" value="<%=book.getPrice() %>">
+<input type="checkbox" name="check" value="<%=book.getId()%>">
+则提交数据形如以下（form里有4条数据，但复选框只够选了id是7和9这两行,则check数组里只有两个值）
+id=6&Count=7&Price=57.0&id=7&Count=234&Price=59.0&check=7&id=8&Count=120&Price=69.0&id=9&Count=2&Price=1.0&check=9
+这时数据接收页就可以从check参数得到的数组里得出哪两个id被选中，从而做批量删除。
+（删除见代码10.5，实现的是单行删除，用复选框控件去提交就可以实现多行删除）
+
+导入代码 10.5，数据库的用户名密码改成自己的即可运行，自行实现批量删除。
+
+批量更新和删除在web编程中比较有用，提交的重名参数在接收端会被当成数组进行提取，然后依据提取的内容循环执行多条sql语句，也可以象代码10.6一样把多条执行语句合到一个batch里，再去执行。
+
+代码 10.6 演示的是批量处理（也可以在循环里逐条处理），前面已经导入数据，这里把代码里数据库密码改成自己的就可以运行。
+1)运行出问题，需要把表清空才能运行，否则id重复。
+2)再运行还有问题，提示string里有非法字符，把“学生”改成英文的就可以通过了。
+
+以上两个问题的解决方法：
+问题1)，id重复造成的，只要在insert语句里去掉对id的赋值让其自动赋值就可以了
+String sql = "insert into tb_student_batch(name,sex,age) values(?,?,?)";
+PreparedStatement ps = conn.prepareStatement(sql);
+相应的，下面几行也修改如下
+ps.setString(1, "stu" + i);
+ps.setBoolean(2, i % 2 == 0 ? true : false);
+ps.setInt(3, random.nextInt(5) + 10);
+
+问题2)，是因为字段name编码是latin1造成的不能存储中文字符。在.sql文件中可以找到创建tb_student_batch的命令如下：
+DROP TABLE IF EXISTS `tb_student_batch`;
+CREATE TABLE `tb_student_batch` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `sex` tinyint(3) unsigned NOT NULL,
+  `age` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+注意最后的内容是DEFAULT CHARSET=latin1。
+而另外两个表都是DEFAULT CHARSET=utf8,因此这个表不能像那两个表一样存储中文。
+使用show create table tb_student_batch;查看表信息，可看到name字段是latin1编码
+使用alter table tb_student_batch character set utf8;修改的是表编码而不是字段编码，该字段仍是latin1。这里可以在此基础上再使用alter table tb_student_batch convert to character set utf8;来把表里所有字符字段设置为utf8编码，此时再查看表信息name字段就不是latin1编码了，此时这个程序就支持中文了。
+
+如果把表和name字段编码设置成gbk，一样可以支持带中文信息的insert，mysql命令行一样能正常显示中文。
+
+前面例子的tb_books表也一样，在mysql的配置文件里设置为gbk时，表和字段无论使用gbk或utf8编码都能支持中文，mysql环境里也能正常显示中文；而在mysql的配置文件里设置为utf8时，表和字段无论使用gbk或utf8编码web程序里都能正常显示，但mysql环境里中文乱码。
+
+中文显示问题受操作系统默认编码，数据库默认编码配置，表及字段的编码，甚至数据库种类及版本等多个因素影响，编程时难有理论方法去保证不出问题，更多要靠实践与测试。latin1一般不会采用，windows系统下建议优先采用gbk编码去测试，linux系统下建议优先采用utf8编码测试。
+
+
+代码10.7演示的是调用mysql数据库端的过程，这个不看了。
+
+
+代码10.8演示的是如何实现分页显示，同样获取数据用servlet，把数据列表存入request范围内，然后转发到jsp里显示数据。与前面的例子里显示所有数据不同，这里在select语句里设置了起始位置和记录数从而可以显示部分数据，起始位置决定显示第几页，记录数决定每页显示的记录数，点击上一页下一页或者点击某一页的操作就是把起始位置作为url参数跳转到获取数据的servlet,然后在jsp里显示获取的数据。
+
+mysql里获得部分数据的sql语句是select * from tb_product order by id desc limit ?,?
+前一个参数是起始记录，后一个参数是每页记录数。这种sql语句属于数据库提供，换用mysql以外的数据库不一定支持这种用法。
+
+两个javabean，一个起自定义结构体的作用，一个提供了几个可供调用的函数。一个jsp首页，只是用来跳转到一个servlet，在servlet里转发到另一个Jsp用于显示数据。
+
+
+代码10.9没有相应数据库，可以自己看代码建立，功能比较简单，就是实现一个insert功能。
+代码10.10没有数据库，可以自己建立，功能就是读取并显示，比较简单。
+
+代码10.11没有数据库，可以自己建立，功能是做批量删除。先用一个servlet通过javabean的方法获取数据，然后转发到一个jsp去显示，显示同时在form里加上复选框，可提交到另一个servlet通过javabean的方法删除多条记录，然后再跳转回前面那个用于读取数据显示的servlet（这个servlet会获取当前数据然后转发到用于显示的jsp）。 代码10.9-10.11所用的数据表结构大致相同，可以改成操作同一张表，就成为一个支持增加，显示，批量删除的web程序。
+
+从MVC的角度去编程，一般就是数据库的增删改查放到servlet里（也可以再下放到bean的方法里），然后转发到jsp去显示。模糊查询就是给select加上条件，insert可以加一条记录，也可以从一个表里读取若干条记录加到另一个表里，删除和修改可以单条操作，也可以批量进行。

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "prodocs-prodocs": {
+      "command": "node",
+      "args": [
+        "D:/AI/AI_Docs/resources/mcp-server/dist/index.js"
+      ],
+      "env": {
+        "DEFAULT_PROJECT": "圣遗物",
+        "API_URL": "http://localhost:3000/api"
+      }
+    }
+  }
+}

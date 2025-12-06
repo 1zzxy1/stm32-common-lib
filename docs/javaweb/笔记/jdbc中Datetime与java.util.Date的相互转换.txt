@@ -1,0 +1,20 @@
+jdbc中Datetime与java.util.Date的相互转换
+
+（java.util.Date包括年月日时分秒，而java.sql.Date只有日期没有时间部分，所以这里没用这个）
+
+
+使用java.sql.Timestamp作为转换的类，可以保留两种类型的时分秒 
+
+
+// 查询时，给Datetime字段传入Date类型的参数  
+Date startTime = new Date(...);  
+Date endTime = new Date(...);  
+ps = conn.prepareStatement(sql);  
+ps.setTimestamp(1, new java.sql.Timestamp(startTime.getTime()));  
+ps.setTimestamp(2, new java.sql.Timestamp(endTime.getTime()));  
+  
+// 查询后，把Datetime字段转换为Date类型  
+Date date;  
+while (rs.next()) {  
+    date = new Date(rs.getTimestamp("xxx").getTime());  
+}  

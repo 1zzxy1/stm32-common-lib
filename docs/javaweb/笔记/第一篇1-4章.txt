@@ -1,0 +1,183 @@
+
+第1章
+
+c/s     client/server    需要安装客户端程序，更新不方便
+b/s     browser/server   客户端只需要有浏览器
+很多貌似c/s结构其实也是b/s，用应用程序模拟浏览器的行为。比如一些订票程序，天气程序，查快递程序，签到程序，群发邮件，账号暴力破解等等，手机程序上更常见这种情况，绝大多数手机app都是B/S模式。
+
+http是一种tcp协议，每次交互由browser与web服务器建立连接，发出request信息,web服务器端程序返回response信息，然后断开连接。
+
+比如在浏览器地址栏输入 http://xxx.xxx.com/然后回车显示页面，这个过程有以下几个步骤
+1） 与xxx.xxx.com的80端口建立连接
+2） get /     (获取webserver里设定的默认主页，如index.htm, index.jsp,default.php。。。等)
+3）如果是静态页面，服务器直接把该文件及其所包含静态文件的内容返回客户端；如果是动态页面，服务器把该页面在服务器端执行，然后把执行结果返回客户端。客户端的浏览器依据收到的信息进行显示。比如百度搜索时输入不同的搜索内容，动态页面返回的结果不同。
+4）断开连接。
+
+静态页面（htm,html,css,js......）,不经服务器端执行，把文件内容返回客户。
+动态页面（cgi,jsp,php,aspx,pl,asp.....）,客户端请求后先在服务器端执行，把执行结果返回客户。
+
+客户端
+浏览器（对css,javascript, html等进行解释执行）
+
+
+服务器端
+常见web服务器：IIS， apache,  tomcat......
+常见服务器端脚本语言：只要服务器端安装了相应语言的解释程序并可以被web服务器调用，就可以用该语言作为服务器端脚本，如perl,asp,php,jsp,aspx......甚至当前也可以把javascript作为服务器端脚本。Linux下的shell脚本也可以作为web服务器端脚本，过去还有把exe，dll文件作为服务器端程序，因为效率低下等问题现在已几乎看不到了。
+
+
+javascript过去只是嵌在浏览器里的脚本，现在已经成为全栈语言，除客户端脚本外，还可以用在服务器端（有服务器端解释程序），可以用在手机跨平台编程（如phonegap，可看作js在特制的浏览器里解释运行，通过该浏览器甚至可以直接访问硬件），可以用来编写桌面程序。html+css+js在编程上的适用范围已经远远超出了客户端浏览器脚本。
+
+
+
+第2章
+
+静态页面不需要有服务器，用浏览器打开页面文件就可以显示页面，不同浏览器显示效果不一定相同。
+常见的静态页面采用html+js+css组合。css（层叠样式表）定义外观形式，html定义页面内容，js提供客户端和用户的交互性。
+
+静态页面代码大致如下：
+<html>
+<head>
+定义一些js函数    //可以包含外部文件
+定义一些css样式（例如代码2.10）   //也可以包含外部文件（例如代码2.12）
+</head>
+。。。
+各种页面元素使用js和css
+。。。
+</html>
+
+注意html文件里一些特殊字符的显示，
+如 < ,  >  空格，双引号，换行等。
+  &lt; &gt;&nbsp; &quot; <br>
+特殊字符在dreamweaver里代码栏中输入&能带出来。
+
+常用的页面元素：表单，按钮，文本框，密码框，文本区域，单选按钮组，复选框，下拉（列表）框，
+隐藏域，图片，超链接，表格（用于显示或定位），div。
+
+css选择器有3种：标记选择器（以标记名为名,通过标签名直接引用），类别选择器（名字点开头，通过 class引用），id选择器（名字#开头，通过id引用）
+引入css有几种方式：行内样式（代码2.11），内嵌式（代码2.10），链接式（代码2.12）
+
+<div>...</div>也是常用的页面元素，类似桌面程序中panel的作用。
+dreamweaver中，div的定位可以很方便的设置为绝对位置(position:absolute)，浮在页面上（Z-index:2）等属性。
+css3中div可以设置成圆角（代码2.14），
+<span>和<div>用法基本一致，div区域单独占一行，span区域不另换行。
+
+书后题
+鼠标经过给出提示信息  代码2.16
+超链接改变鼠标形状 代码2.17不好用。
+
+
+第3章 
+
+javascript可用于浏览器客户端脚本，和用户的交互；用于实现“动态”网页；用于ajax；用于web服务器端脚本；用于跨平台开发；用于桌面应用开发。。。本门课涉及到的是浏览器客户端脚本和ajax。
+
+客户端js依赖浏览器，与java语言无关，由浏览器解释执行；不能访问本地文件；代码区分大小写；js是弱类型语言，变量在使用时必须要被赋值，类型由所赋值决定。
+
+html中元素在客户端js中一般用id属性来区分（也可以用name），发送到服务器端的信息（request信息）用name属性来区分。代码3.2是一个检测文本框不得为空然后提交的例子。代码3.7是js中使用正则表达式对用户输入进行验证的例子，输入正确后执行form1.submit();就是向服务器提交表单。对用户输入有效性的验证一般在客户端和服务器端都要做正则表达式验证，客户端做验证是为了减轻服务器负担，服务器端做验证是为了安全性。
+
+正则表达式验证的用法大致如下
+var objExp=/正则表达式/;	//创建RegExp对象,注意两边是/,两边没有“
+			if(objExp.test(str)==true){		//判断是否匹配
+				alert("正确！");
+			}else{
+				alert("不正确！");
+			}
+
+用作子串替换也一样,两边没有”
+str.replace(/(^\s*)|(\s*$)/g, "");
+g参数表示全局，也就是所有匹配项都替换，而不是匹配到一个后边的就不找了。
+正则表达式中^表示字符串开头，$表示字符串结尾，所以是把两端的空白字符替换成空。
+
+
+
+代码2.10为窗口的load事件添加了js代码，启动了一个时钟事件，每隔一段时间获取当前时间显示在某个页面元素上。函数参数里的clock可以改成其他参数名。
+
+<html>
+  <head>
+    <title>实时显示系统时间</title>
+    <script language="javascript">
+    function realSysTime(clock){
+    	var now=new Date();			//创建Date对象
+    	var year=now.getFullYear();	//获取年份
+    	var month=now.getMonth();	//获取月份
+    	var date=now.getDate();		//获取日期
+    	var day=now.getDay();		//获取星期
+    	var hour=now.getHours();	//获取小时
+    	var minu=now.getMinutes();	//获取分钟
+    	var sec=now.getSeconds();	//获取秒钟
+    	month=month+1;
+    	var arr_week=new Array("星期日","星期一","星期二","星期三","星期四","星期五","星期六");
+    	var week=arr_week[day];		//获取中文的星期
+    	var time=year+"年"+month+"月"+date+"日 "+week+" "+hour+":"+minu+":"+sec;	//组合系统时间
+    	clock.innerHTML="当前时间："+time;	//显示系统时间
+    }
+    window.onload=function(){
+		window.setInterval("realSysTime(clock)",1000);	//实时获取并显示系统时间
+    }
+    </script>
+  </head>
+  
+  <body>
+    <div id="clock"></div>
+  </body>
+</html>
+
+
+css和javascript部分除直接放在页面head部分外，也可以引入外部文件，如下：
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<link href="xxx.css" rel="stylesheet">
+<script src="yyy.js"></script>
+<title>aaaaa</title>
+</head>
+也可以把xxx.css和yyy直接放到引用处。
+
+代码2.11用js把页面元素的标记输出出来。
+代码2.12用js在按钮事件里动态的增删文档节点和内容。
+
+书后题答案见代码3.13-3.15，把js代码放到了jsp页面里，需要有tomcat和jdk才能运行。这几个jsp文件在eclipse for java ee建立的项目中。界面复杂的jsp文件建议用dreamweaver编写，然后再从文件管理器中拖到eclipse项目里。
+
+
+补充一个点击超链接时由用户进行确认的例子
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript">
+	
+	 function yesorno(){
+		 var a=confirm('yes or no?');
+		 return a;
+	 }
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<a href=http://www.baidu.com onclick="return yesorno()">click</a>
+</body>
+</html>
+
+上例很容易改成点提交按钮时进行询问是否确定提交（参照判断form里文本框是否为空的代码3.2）
+
+如果要把js里的提示改为中文可以把代码里的编码都换成utf-8("-"这里不能省略，html不认utf8)，然后把源码存成utf-8；
+或者也可以代码里的编码都换成gbk,然后把源码存成gbk(eclipse菜单-edit-set encoding)
+
+
+第4章
+
+这一章是关于eclipse for java ee开发环境的安装和配置，见”搭建开发环境.docx“。合适版本的jdk才能启动eclipse for java ee，eclipse目录里的eclipse.ini可以看到对jdk版本的要求。eclipse不自带web服务器，还需要和环境设置里的jdk相匹配能正常启动的tomcat，把tomcat设为服务器才能在eclipse里运行web项目。
+
+eclipse里web项目的目录结构打开一个源码或者新建一个项目就可以看到。
+
+tomcat里web应用的目录结构和myeclipse项目基本一致，把jsp,class,xml放到tomcat相应目录就可以完成部署。
+假设tomcat里webapps目录下某个web应用在目录app1中，则各类文件放置位置如下：
+app1/WEB-INF/classes/com/xxxx/x.class     （x类定义在com.xxxx包里）
+app1/*.jsp
+app1/WEB-INF/web.xml
+如果jsp在子目录x里则
+app1/WEB-INF/classes/com/xxxx/x.class
+app1/x/*.jsp
+app1/WEB-INF/web.xml
+即javabean或servlet类的位置是固定的，和jsp文件位置无关。x.class可以是bean，也可以是servlet
+web.xml放入app1/WEB-INF目录下,存放配置信息。

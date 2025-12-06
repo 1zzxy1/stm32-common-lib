@@ -1,0 +1,36 @@
+
+如果是导入书上源程序，要进入项目的build目录下，把导入时附带进来的class文件删除，然后运行时能重新生成class并正常运行才算项目配置后没有问题。过滤器项目对编译器和servlet版本配置上要求比较严，导入的项目有可能因为版本配置问题不能重新生成class文件，此时如果不删除附带进来的class也不报错，进行代码修改也不会生效，所以要先删除导入时带的class能重新生成并运行这个项目才算正常导入进来。
+
+（代码9.1是使用web.xml进行配置的servlet3.0项目）涉及到编译器和servlet版本配置有如下几个地方：
+右键项目-properties
+  java build path-libraries (jre我用的1.7版本，这里设为默认的jre7)
+  java compiler (这里jdk版本改为1.7)
+  project facets (dynamic web module保留默认3.0，java 设为 1.7)
+
+不涉及过滤器的项目一般不用这么严格，但涉及过滤器的需要严格设置才能不报错。这类版本设置问题导致的页面报错信息如下：
+The origin server did not find a current representation for the target resource or is not willing to disclose that one exists.
+控制台运行报错信息如下：
+严重: Exception starting filter CountFilter
+java.lang.ClassNotFoundException: com.lyq.CountFilter   （9.1的类名）
+。。。。
+。。。。
+出现这种提示是没能成功生成class文件，但不是代码的问题，这就需要对上述几处版本进行调整，调整为一致且符合本机配置。书上的代码导入后可以直接运行，但实际上没有重新生成class，需要调整版本才能生成build目录下的class，否则后续做出修改不会生效（不重新生成class,有旧的class运行时又不报错）。
+
+
+
+如果是自己新建项目，也要注意上述几点才能生成过滤器的class，新建一般不会出问题。
+建立以下servlet2.5和3.0项目，因为是新建，正常情况不需要去手动修改上述版本问题。如果在排除各方面情况下仍存在问题，也可以尝试重启eclipse或关机重启电脑后重试。
+1.自己建一个servlet2.5项目，通过粘贴代码9.1的代码和配置文件实现和9.1相同的功能。经测试可行。
+  做出一些修改，把过滤器的过滤对象改为针对servlet或针对某个目录下所有Jsp页面
+2.自己建一个servlet3.0项目，通过粘贴代码9.1的代码和使用注释代替web.xml文件实现和9.1相同的功能。经测试可行。
+
+导入的项目如果无论怎样修改都不能重新生成class，那就新建一个项目把代码粘贴进来（代码9.2似乎就是这种情况，可以新建项目解决，另外经测试删除web.xml改用注释也可以解决这个问题）
+过滤器类前加注释
+@WebFilter(
+		urlPatterns = { "/*" }, 
+		initParams = { 
+				@WebInitParam(name = "encoding", value = "UTF-8")
+		})
+servlet类前加注释
+@WebServlet("/AddServlet")
+然后删除web.xml后代码9.2就可以生成class。（web.xml里有问题？？）

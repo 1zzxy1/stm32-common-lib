@@ -1,0 +1,432 @@
+第3篇 10-13章
+
+第10章 java web的数据库操作
+
+本章可以参考上学期“面向对象程序设计”第20章数据库部分的内容。相应Jdbc jar包已经在源码的lib目录下，也可以改用新版本的jar包。tomcat里，用到的第三方jar包也要放到当前web应用的lib目录下。
+
+使用mysql，适合书上源码的是在安装mysql使选用gbk编码方式，也可以照下文说明在安装后进行配置修改。数据库和表可以照书上的内容自己建立，也可以导入源码里的db_database10.sql来创建。
+
+mysql如何修改root用户的密码(可能受版本等影响，不一定通用)
+方法1： 用SET PASSWORD命令 
+首先登录MySQL。 
+格式：mysql> set password for 用户名@localhost = password('新密码'); 
+例子：mysql> set password for root@localhost = password('123'); 
+
+方法2：用mysqladmin 
+格式：mysqladmin -u用户名 -p旧密码 password 新密码 
+例子：mysqladmin -uroot -p123456 password 123 
+
+方法3：用UPDATE直接编辑user表 
+首先登录MySQL。 
+mysql> use mysql; 
+mysql> update user set password=password('123') where user='root' and host='localhost'; 
+mysql> flush privileges; 
+
+方法4：在忘记root密码的时候，可以这样 
+以windows为例： 
+1. 关闭正在运行的MySQL服务。 
+2. 打开DOS窗口，转到mysql\bin目录。 
+3. 输入mysqld --skip-grant-tables 回车。--skip-grant-tables 的意思是启动MySQL服务的时候跳过权限表认证。 
+4. 再开一个DOS窗口（因为刚才那个DOS窗口已经不能动了），转到mysql\bin目录。 
+5. 输入mysql回车，如果成功，将出现MySQL提示符 >。 
+6. 连接权限数据库： use mysql; 。 
+6. 改密码：update user set password=password("123") where user="root";（别忘了最后加分号） 。 
+7. 刷新权限（必须步骤）：flush privileges;　。 
+8. 退出 quit。 
+9. 注销系统，再进入，使用用户名root和刚才设置的新密码123登录。
+
+
+
+mysql导入导出sql文件方法和命令如下：
+
+window下
+
+1.导出整个数据库
+mysqldump -u 用户名 -p 数据库名 > 导出的文件名
+mysqldump -u dbuser -p dbname > dbname.sql
+
+2.导出一个表
+mysqldump -u 用户名 -p 数据库名 表名> 导出的文件名
+mysqldump -u dbuser -p dbname users> dbname_users.sql
+
+3.导出一个数据库结构
+mysqldump -u dbuser -p -d --add-drop-table dbname >d:/dbname_db.sql
+-d 没有数据 --add-drop-table 在每个create语句之前增加一个drop table
+
+4.导入数据库
+常用source 命令
+进入mysql数据库控制台，如
+mysql -u root -p
+mysql>use 数据库     (如果建库也在.sql文件里就不用这句)
+然后使用source命令，后面参数为脚本文件(如这里用到的.sql)
+mysql>source d:/dbname.sql
+
+数据库在gbk或utf8编码下一般不需要在保存和读取时做转换，如果在latin1(即iso8859_1)编码则需要编码转换。
+
+mysql数据库有时需要设置语言编码（如果初始安装时选择了latin1），这里以gbk为例(书上的源码如果mysql是latin1编码则保存时会丢失中文信息，除非修改源码在保存和提取时做gbk和iso8859-1互转；如果mysql是utf8编码则程序里没有问题，但在mysql环境里是乱码[保存和提取时做gbk和utf8互转?,该问题有可能与windows系统默认编码是gbk有关,建议windows下mysql安装时或在配置文件里设置为gbk，linux下mysql设置成utf8]；只有mysql是gbk编码时，源码不用改动，且程序和mysql里都能正常显示中文)，两种方法如下：(可以只看第一种)
+
+1.直接修改配置文件（我用的这种，mysql的安装目录下my.ini里只有两项和编码有关，改成gbk）
+MySql的配置文件Windows下一般在系统目录下或者在MySql的安装目录下名字叫my.ini，Linux下一般是/etc/my.cnf。
+注意改动配置文件后要重启mysql服务。Windows下命令如下：
+
+net stop mysql
+net start mysql
+
+进入mysql后 执行 ：show variables like "%character%";查看修改结果如下即可
+| character_set_client     | gbk
+           |
+| character_set_connection | gbk
+           |
+| character_set_database   | gbk
+           |
+| character_set_filesystem | binary
+           |
+| character_set_results    | gbk
+           |
+| character_set_server     | gbk
+           |
+| character_set_system     | utf8
+
+2.用mysql命令进行修改。(把编码改成gbk，这个似乎有的选项不能改，建议上一种)
+进入mysql后 执行 ：show variables like "%character%";
+显示结果应该类似如下：
+
+| character_set_client | utf8 |
+
+| character_set_connection | utf8 |
+
+| character_set_database | utf8 |
+
+| character_set_results | utf8 |
+
+| character_set_server | utf8 |
+
+| character_set_system | utf8 |
+
+| character_sets_dir | /usr/share/mysql/charsets/ |
+
+ 
+如果编码不是gbk的，可使用mysql命令设置：
+
+set character_set_client = gbk;
+
+set character_set_server = gbk;
+
+set character_set_connection = gbk;
+
+.......
+
+另外：
+
+建立数据库时可以使用以下命令设置数据库编码：
+
+create database app_relation character set gbk; 
+
+use app_relation;
+
+source app_relation.sql;
+
+修改数据库编码的命令为：
+
+alter database app_relation character set gbk; 
+
+
+
+在Mysql里使用source命令从sql文件建立数据后，可以导入代码10.2和10.3，一个用于向数据表里添加，一个用于显示数据表的内容。
+ 
+注意源码里要把数据库的用户名和密码修改成自己的。
+这些例子包括后续例子都是通过servlet来做数据库的增删改查，显示数据是在jsp里，由servlet做转发，在jsp里把servlet里获得的数据显示出来。
+
+
+多次运行书上源码，有可能会有jdbc jar 包频繁装载出现不能运行的问题。此时可以在调试窗口的server下把调试项目删除，然后重新运行该项目就可以了。注意是下方调试窗口servers栏的，别错删源码。
+
+
+10.2和10.3过滤servlet里设置语句重复了，改成
+request.setCharacterEncoding("UTF-8");   //这句在接收参数时必须有,否则接收的中文乱码
+response.setCharacterEncoding("UTF-8");	 //这句在本例里似乎有没有没影响
+
+
+
+代码10.4是列出数据并针对某行进行修改，注意在这两个servlet代码里都要把数据库的用户名和密码修改成自己的。这里用了html里的hidden控件保存id。这个例子可以改成把原值显示在文本框里再修改（加个value属性），并且扩展成同时修改多个字段。
+
+以上用法比较简单，一次只能改一行记录。
+这个例子也可以改成批量提交多条记录，把form标签和submit按钮拿到表格(循环)外面就可以处理多行记录，
+如
+<form action="UpdateServlet" method="post">
+	<table align="center" width="500" border="1" height="170" bordercolor="white" bgcolor="black" cellpadding="1" cellspacing="1">
+	。。。。。。。。
+						
+	<input type="hidden" name="id" value="<%=book.getId()%>">
+	<input type="text" name="Count" value="<%=book.getBookCount() %>">
+	<input type="text" name="Price" value="<%=book.getPrice() %>">
+							
+	。。。。。。。。
+	</table>
+	<input type="submit" value="修　改">
+</form>
+
+此时抓包post数据形如以下（多次循环，因此控件重名，即每个参数有多个值）
+id=6&Count=7&Price=22&id=7&Count=234&Price=59.0&id=8&Count=120&Price=69.0&id=9&Count=2&Price=1.0
+
+这种情况可以在数据接收页通过数组获取出来所有数据（这样传递的参数被当作是数组来提取值）
+public class UpdateServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String[] id=request.getParameterValues("id");
+		String[] price=request.getParameterValues("Price");
+		PrintWriter out=response.getWriter();
+		for(String a:id)
+			out.print(a);
+		for(String a:price)
+			out.println(a);
+	}
+
+}
+
+注意参数是数组，要使用形如String[] id=request.getParameterValues("id");，如果单个参数则使用String id=request.getParameter("id");
+
+只要能提取出form里提交过来的数据，就可以形成多行数据进行多行更新（比如批量录入成绩,就是接收到多个id及其对应的多个更改后的值，要在循环里更新多条记录）。
+
+提交的也可能是一列复选框的值，这样可以进行批量删除。form里加个checkbox，则通过循环形成复选框列，form里输入元素如下
+<input type="hidden" name="id" value="<%=book.getId()%>">
+<input type="text" name="Count" value="<%=book.getBookCount() %>">
+<input type="text" name="Price" value="<%=book.getPrice() %>">
+<input type="checkbox" name="check" value="<%=book.getId()%>">
+则提交数据形如以下（form里有4条数据，但复选框只够选了id是7和9这两行,则check数组里只有两个值）
+id=6&Count=7&Price=57.0&id=7&Count=234&Price=59.0&check=7&id=8&Count=120&Price=69.0&id=9&Count=2&Price=1.0&check=9
+这时数据接收页就可以从check参数得到的数组里得出哪两个id被选中，从而做批量删除。
+（删除见代码10.5，实现的是单行删除，用复选框控件去提交就可以实现多行删除）
+
+导入代码 10.5，数据库的用户名密码改成自己的即可运行，自行实现批量删除。
+
+批量更新和删除在web编程中比较有用，提交的重名参数在接收端会被当成数组进行提取，然后依据提取的内容循环执行多条sql语句，也可以象代码10.6一样把多条执行语句合到一个batch里，再去执行。
+
+代码 10.6 演示的是批量处理（也可以在循环里逐条处理），前面已经导入数据，这里把代码里数据库密码改成自己的就可以运行。
+1)运行出问题，需要把表清空才能运行，否则id重复。
+2)再运行还有问题，提示string里有非法字符，把“学生”改成英文的就可以通过了。
+
+以上两个问题的解决方法：
+问题1)，id重复造成的，只要在insert语句里去掉对id的赋值让其自动赋值就可以了
+String sql = "insert into tb_student_batch(name,sex,age) values(?,?,?)";
+PreparedStatement ps = conn.prepareStatement(sql);
+相应的，下面几行也修改如下
+ps.setString(1, "stu" + i);
+ps.setBoolean(2, i % 2 == 0 ? true : false);
+ps.setInt(3, random.nextInt(5) + 10);
+
+问题2)，是因为字段name编码是latin1造成的不能存储中文字符。在.sql文件中可以找到创建tb_student_batch的命令如下：
+DROP TABLE IF EXISTS `tb_student_batch`;
+CREATE TABLE `tb_student_batch` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `sex` tinyint(3) unsigned NOT NULL,
+  `age` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+注意最后的内容是DEFAULT CHARSET=latin1。
+而另外两个表都是DEFAULT CHARSET=utf8,因此这个表不能像那两个表一样存储中文。
+使用show create table tb_student_batch;查看表信息，可看到name字段是latin1编码
+使用alter table tb_student_batch character set utf8;修改的是表编码而不是字段编码，该字段仍是latin1。这里可以在此基础上再使用alter table tb_student_batch convert to character set utf8;来把表里所有字符字段设置为utf8编码，此时再查看表信息name字段就不是latin1编码了，此时这个程序就支持中文了。
+
+如果把表和name字段编码设置成gbk，一样可以支持带中文信息的insert，mysql命令行一样能正常显示中文。
+
+前面例子的tb_books表也一样，在mysql的配置文件里设置为gbk时，表和字段无论使用gbk或utf8编码都能支持中文，mysql环境里也能正常显示中文；而在mysql的配置文件里设置为utf8时，表和字段无论使用gbk或utf8编码web程序里都能正常显示，但mysql环境里中文乱码。
+
+中文显示问题受操作系统默认编码，数据库默认编码配置，表及字段的编码，甚至数据库种类及版本等多个因素影响，编程时难有理论方法去保证不出问题，更多要靠实践与测试。latin1一般不会采用，windows系统下建议优先采用gbk编码去测试，linux系统下建议优先采用utf8编码测试。
+
+
+代码10.7演示的是调用mysql数据库端的过程，这个不看了。
+
+
+代码10.8演示的是如何实现分页显示，同样获取数据用servlet，把数据列表存入request范围内，然后转发到jsp里显示数据。与前面的例子里显示所有数据不同，这里在select语句里设置了起始位置和记录数从而可以显示部分数据，起始位置决定显示第几页，记录数决定每页显示的记录数，点击上一页下一页或者点击某一页的操作就是把起始位置作为url参数跳转到获取数据的servlet,然后在jsp里显示获取的数据。
+
+mysql里获得部分数据的sql语句是select * from tb_product order by id desc limit ?,?
+前一个参数是起始记录，后一个参数是每页记录数。这种sql语句属于数据库提供，换用mysql以外的数据库不一定支持这种用法。
+
+两个javabean，一个起自定义结构体的作用，一个提供了几个可供调用的函数。一个jsp首页，只是用来跳转到一个servlet，在servlet里转发到另一个Jsp用于显示数据。
+
+
+代码10.9没有相应数据库，可以自己看代码建立，功能比较简单，就是实现一个insert功能。
+代码10.10没有数据库，可以自己建立，功能就是读取并显示，比较简单。
+
+代码10.11没有数据库，可以自己建立，功能是做批量删除。先用一个servlet通过javabean的方法获取数据，然后转发到一个jsp去显示，显示同时在form里加上复选框，可提交到另一个servlet通过javabean的方法删除多条记录，然后再跳转回前面那个用于读取数据显示的servlet（这个servlet会获取当前数据然后转发到用于显示的jsp）。 代码10.9-10.11所用的数据表结构大致相同，可以改成操作同一张表，就成为一个支持增加，显示，批量删除的web程序。
+
+从MVC的角度去编程，一般就是数据库的增删改查放到servlet里（也可以再下放到bean的方法里），然后转发到jsp去显示。模糊查询就是给select加上条件，insert可以加一条记录，也可以从一个表里读取若干条记录加到另一个表里，删除和修改可以单条操作，也可以批量进行。
+
+
+
+第11章 EL表达式语言
+EL是expresson language的缩写，在jsp2.0里引入。EL表达式可以看成jsp的标签，用来简化代码。事实上jsp页面里的标签最终都要翻译成java代码，采用标签可以简化代码，在形式上更好实现界面与代码分离。
+
+${变量名}可以直接在页面输出存储在服务器端的变量（如果page,request,session,application范围内存有该变量）。javabean对象其实也是存储在服务器端，id就是其变量名，也可以通过代码和EL表达式进行存取。
+例子11.6就是通过EL输出javabean对象里的信息。
+
+代码 11.1使用了一个字符串数组和N个整型变量（存储在request范围内），然后用EL进行输出。
+
+Jsp里不使用EL表达式（把表达式原样输出）有3种方法：可以前面加\，可以通过page指令禁用，也可以通过web.xml配置。
+
+EL不能使用保留关键字。
+代码11.2和11.1类似，只是字符串数组变量存储在session里。
+
+代码11.3演示的是EL中布尔值的输出。
+
+通过pageContext可以在EL表达式中获取一些JSP内部对象（如page,request,session,exception，out）,application,config不能通过pageContext获取，但servletContext可以通过pageContext获取，有servletContext也就有了application。
+
+pageScope.变量名，requestScope.变量名，sessionScope.变量名，applicationScope.变量名,可以在EL表达式里获取指定范围内的变量。前面不指定变量范围时，按范围从小到大查找变量。
+代码11.4演示了Page范围内javabean对象的获取
+
+
+EL还可以用${param.name}获取提交过来的参数，提交过来的参数是数组时（比如通过复选框批量删除），用${paramValues.name[i]}获取数组中第i个值。
+
+代码11.5演示了使用${initParam.company}获取出定义在web.xml里的名为company的初始变量值。
+
+EL还有 header对象， headerValues对象，cookie对象等。
+
+E还可以自定义标签及其对应的方法（通过标签定义文件进行关联），有兴趣的可以自己看看。
+
+
+第12章 JSTL标签
+
+这是个标签库，需要引入Jar包，用标签来替代程序代码，方便jsp编程及界面代码分离。如赋值，输出，流程控制，数据库操作等，都可以用标签替代代码，有兴趣的自己看看其他参考书，书上这一章内容只是其中很少一部分。
+
+
+各种java web框架可以暂且理解为 自定义标签及方法，相应配置文件，一定格式的servlet相结合，方便编程人员编程。 
+
+第13章 AJAX技术
+
+1.AJAX意思: 异步java与xml
+2.AJAX作用：局部刷新页面，不是新技术，是多种技术相结合。
+            用到javascript, xhtml，css, xml，xmlhttprequest(一个activex控件，ajax的核心)等。
+3.早期实现局部刷新，可使用框架(frame)和iframe，靠多个页面组合在一起呈现局部刷新。
+  可以用该方法实现无刷新聊天室。
+4.使用xmlhttprequest实现局部刷新
+  见例子 xmlhttprequest例子.htm。(需要IE设置允许运行active控件)
+  在客户端  javascript中利用xmlhttprequest对象和服务器通信，收回的信息用javascript显示在页面上，实现页面的无刷新。  
+具体代码如下：
+
+  <html>
+    <head>
+        <title>Ajax Internet Explorer Flavor</title>
+        <script language="javascript">
+            var dom = new ActiveXObject('MSXML2.FreeThreadedDOMDocument.3.0');
+            var objXMLHTTP = new ActiveXObject('Microsoft.XMLHTTP');
+
+            /*
+            从服务器获取XML文档
+            */
+            function initialize() {
+                
+            }
+            /*
+            处理XMLHTTP请求的应答
+            */
+            function stateChangeHandler() {
+                if (objXMLHTTP.readyState == 4)
+                    try {
+                        dom.loadXML(objXMLHTTP.responseText);
+                        document.getElementById('time').innerText =
+objXMLHTTP.responseText;
+                    }
+                    catch (e) { }
+            }
+            function Button1_onclick() {
+                var strURL = 'http://www.baidu.com/';
+
+                objXMLHTTP.open('GET', strURL, true);
+               //如果是post则要向下面一样自定义http头
+               // objXMLHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                objXMLHTTP.onreadystatechange = stateChangeHandler;
+
+                try {
+                    objXMLHTTP.send(null);//post则null换为提交的信息
+                }
+                catch (e) {
+                    alert(e.description);
+                }
+            }
+
+        </script>
+  </head>
+  <body onload="initialize()">
+    <div id="time"></div>
+      <p>
+          <input id="Button1" type="button" value="button" onclick="return Button1_onclick()" /></p>
+  </body>
+</html>
+
+5. AJAX不是java web专有，只要可以用来做web的语言都支持，如.net，asp，php，perl等也都可以。因为xmlhttprequest是浏览器端对象，与服务器端脚本无关。有了xmlhttpresquest就可以实现局部刷新，但要注意不同浏览器在该activex控件的创建上有所不同。(上例代码只针对IE)
+
+
+
+总结：XMLHttpRequest对象可以看成是嵌在浏览器里的一个不可见控件，能够访问（get）某个Url或者向某个Url提交（post）数据，并且能够通过回调函数对接收到的回复进行处理，可在javascript里实现与web服务器的交互和网页的局部刷新。AJAX属于客户端技术，与服务器端使用何种语言无关，但不同浏览器创建该对象的方式有所不同，需要在javascript里判断浏览器类型，然后再创建该对象。浏览器客户端有很多框架，许多框架对XMLHttpRequest做了二次封装，XMLHttpRequest需要浏览器设置为允许activex。
+
+这一章的部分源代码在import到eclipse后，在add library里除了jre system library,还需要添加server runtime。
+
+代码13.1演示了如何判断一个新注册用户名是否可用，把用户名通过xmlhttprequest发送给服务器端，然后服务器端检查是否有重名，然后把检查结果反馈给客户端，客户端显示该结果。
+如果eclipse自带浏览器不能显示图片就用chrome浏览器。
+提示信息通过一张背景图片显示成特殊形状。
+如果server.xml里在设置端口号的行对编码没有进行设置或设置了URIEncoding="iso-8859-1"，则13.1对中文用户的检测没有问题。如果server.xml里在设置端口号的行设置了URIEncoding="UTF-8"，则对中文url参数的提取将出现问题，具体具体原因和解决方法如下。（设置了URIEncoding="GBK"一样会有问题，代码里把参数值从iso8859转gbk那行去掉就可以了，因为此时tomcat已经自动做了这件事，再做一次反而会出问题）
+
+
+通过前面的学习应该知道url里不能有中文和特殊字符，客户端应该做url编码后再发送（这种编码通常会自动做，有utf8和gbk两种，也可以主动去做。js的url编码函数有多种，自己百度, 以下用的这种是做utf-8方式的url编码，这里如果不主动编码会按页面编码方式按gbk方式进行编码，而服务器端tomcat会按URIEncoding="UTF-8"自动对url参数做utf8方式解码，这就导致url参数是汉字时实际提取了乱码，存在同汉字名用户也就检测不出来了），改为
+createRequest('checkUser.jsp?user='+encodeURIComponent(userName.value));
+服务器端也相应改为
+request.setCharacterEncoding("utf-8");//这句可以注销
+//如果server.xml里在设置端口号的行设置了URIEncoding="UTF-8"，tomcat对url里的值进行解码时自动按server.xml里设置的编码方式，不设置则默认按iso8859-1方式。request.setCharacterEncoding事实上对url参数的解码不起作用可以省略（只对post数据解码起作用）。
+String user=request.getParameter("user");
+//如果server.xml里在设置端口号的行设置了URIEncoding="UTF-8"，则tomcat默认对所有url参数里传来的值自动做了utf-8方式的url解码，所以url参数里按照gbk编码的参数值经历tomcat自动解码后无论在后续代码里如何接收都会是乱码，此时Url参数需要做utf8方式的url编码才能在接收时避免乱码。
+//tomcat对url中参数的自动解码不受request.setCharacterEncoding影响，只受配置文件里的设置影响；tomcat对post数据的自动解码始终是按照ISO8859-1，受request.setCharacterEncoding影响，
+
+发送的url请求及数据可以通过fidder抓包来验证，服务器端解码回复也可以通过抓包验证(或使用System.out.println将获取到的参数或者回复的信息输出到控制台窗口进行观察)。涉及中文的问题各种各样，没有统一的理论解决方法，但一些基本规律需要掌握：
+1.url和post的数据，一般都要发送前做url编码；
+2.url编码有utf8和gbk两类，导致汉字被编成三个字节还是两个字节，解码也要与之匹配；
+3.接收端接收数据一般要做request.setCharacterEncoding("gbk或utf-8")，尽量少用代码直接去转换编码这种方式。
+
+汉字方面的显示或匹配都有可能出问题，在掌握以上规律基础上可通过抓包，修改程序，再次验证来解决问题，这才是真正通用的解决问题的办法。
+
+
+
+
+代码13.2把与xmlhttprequest有关的代码封装到一个单独的js文件里(定义成了类)，然后再去调用其中的方法。
+主页的js里通过定时器每隔600秒，也就是10分钟去调用一个getInfo方法，getInfo方法里定义了服务器端url,定义了提交方式，定义了回调函数为deal_getInfo，定义了处理错误的函数为onerror，这些都作为参数传递给了单独js文件里的AjaxRequest方法，实现了AJAX,每隔10分钟读取服务器端数据库里的内容并显示。
+
+这个例子的运行需要有相应数据库。源码里有.sql文件，有兴趣的自行导入mysql后运行，导入方法见前文数据库部分。
+为防止读取的是缓存数据，可以在链接后面加上时间戳，这里时间戳的作用就是让url不同来避免获取到缓存里的旧数据。
+
+
+代码13.3没用到数据库，可以直接运行（若自带浏览器不好用请使用chrome）。servlet接收两种参数，一种会发送所有省份名称，一种发送某个省里所有城市名称。注意和13.1同样问题，tomcat会对url参数按tomcat里的配置自动进行url解码，按server.xml默认编码配置13.3没有问题，但如果配置了URIEncoding="UTF-8"，那么这个程序就有问题了，因为通过url参数传递的省名不会被正确接收，解决方法与13.1一样，主动对url参数进行utf8方式的url编码。
+
+
+代码13.4的第三方Jar包里缺少需要import的类，以前讲过servlet3.0实现文件上传的办法，这里就不具体看这个用第三方jar的例子了。这里是要实现实时显示文件上传进度的进度条，在循环写入服务器端文件时把已写入的大小与文件总大小的比存入session，客户端js里每隔一段时间用xmlrequest获取session的值，然后依据该值动态改变一个有背景色的客户端元素的长短就可以了。
+
+
+
+代码13.5-13.7是书后题。
+
+13.5是页面显示当前时间，这种功能可以用js完成，获取客户端时间显示。这里是xmlrequest获取服务器端时间，然后显示到某个客户端元素上。
+13.6用到了数据库，每隔一段时间按添加时间从后先前把select出来的数据显示出来。如果再有个添加数据的页面，这个程序也可以看成是个聊天室。
+13.7也用到数据库，鼠标移到某个页面元素上就从数据库里读取一段说明进行提示。
+
+
+
+关于java web编程中汉字编码的说明
+会出现用到汉字编码的几处地方：
+1.cookies值：cookie里不能存放汉字，因此在存放汉字的时候要主动做url编码，url编码有utf8和gbk两种，存放前编码，提取后解码，编解码要一致。
+2.url参数值：要做Url编码，特殊字符需要（如&=?空格等），汉字也需要。其中汉字通常会自动做编码，而主动编码可以去选择utf8或gbk。tomcat配置文件server.xml里的URIEncoding设置会让web服务器对url参数自动做url解码（汉字将有3种解码方式,iso8859,utf8,gbk，汉字如果按8859自动解码后还需要用代码去按编码方式转码，按后两种自动解码的情况下URIEncoding设置决定了所采用的编码方式），request.setCharacterEncoding语句影响不到Url参数的解码。
+3.post数据值：自动做url编码，gbk还是utf8视页面编码而定；tomcat在服务器端自动按iso8859解码，request.setCharacterEncoding后可以直接提取其值，也可以用代码转编码，两种方式一般都可以。
+4.url里出现中文路径或文件名：要做gbk或utf8编码，视server.xml里的URIEncoding如何设置，另外空格要换成%20(编码后就是+换%20)，一般只需编码不再需要解码。
+
+
+
+补充几个例子
+1.图片验证码
+verification_code-master.zip,解压后在eclipse for jee导入。这个例子的jre library需要使用jre8(也可以properties里的jre，java compiler连同project facets一起改成1.7版)，例子里还使用了jquery，通过二次封装方便了页面元素的获取和设置，也方便了AJAX的使用。例子里用了两个servlet，一个servlet用来把随机验证码存入session并生成图片流（图片流可作为图片文件在img元素里显示，url后加时间戳避免被缓存），另一个servlet验证AJAX提交来的验证码是否正确。这个例子可以加个密码框一起提交验证，成功则跳转到某页，不成功则给出提示仍留在登录页。
+
+2.excel文件的读取
+网站有时需要批量导入功能，用户上传excel表格，然后读取表格内容存入数据库。
+readxls.rar，解压后在eclipse for jee导入。这个例子里的lib目录里已经带了jxl.jar(通过文件管理器拖到项目lib目录里)，这个jar可以处理97-2003版本excel文件的读写，从excel里读出的内容是gbk编码，servlet里response.setCharacterEncoding("gbk")就可以正常显示。
+
+3.excel文件的写入
+这种例子一般是由用户打开一个excel模版文件，然后对这个模版进行修改后另存在自己的目录里生成excel文件（借助jxl.jar写入数据）,然后点链接下载文件或直接生成excel文件流下载。
+例子readxls.rar，解压后在eclipse for jee导入，这个例子里的lib目录里已经带了jxl.jar。注意运行后生成的文件并不在源码目录，而是在server的临时目录里（eclipse工程目录下.metadata\.plugins\org.eclipse.wst.server.core\tmp1\wtpwebapps\writexls）。
+注意代码里sheet.addCell(new Label(0,1,"测试数据2"))表示给当前打开的工作表第0列第1行赋值（先列后行，与数组里的行列概念不同）。

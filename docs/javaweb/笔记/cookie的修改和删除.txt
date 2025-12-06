@@ -1,0 +1,16 @@
+cookie的修改和删除（例子6.3是cookie的读取和创建，读取需要通过遍历来做，创建如果已有同名cookie则报错。下面补充cookie的修改和删除，修改是在遍历里做，类似创建，修改和创建实质都是通过response.addcookie生成set-cookie头。删除cookie则是通过设置过期时间来完成）
+
+先获取cookies;
+if (cookies != null) {
+	for (int i = 0; i < cookies.length; i++) {	//遍历cookie对象的集合
+		if (cookies[i].getName().equals("mrCookie")) {//如果cookie对象的名称为mrCookie
+			String user2 = URLEncoder.encode(user,"utf8");
+			
+		    
+		//cookies[i].setValue(user2+"#"+new java.util.Date().toLocaleString());//这句是修改
+		
+		//cookies[i].setMaxAge(0);//这句则是取消这个cookie
+		response.addCookie(cookies[i]);
+		}
+	}
+}

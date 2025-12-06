@@ -1,0 +1,30 @@
+页面中，无论用地址栏url(等同form get方法)或form post方法，参数一般都不需要自己做url编码，浏览器和form会自动做url编码(视页面编码决定对中文做gbk或utf-8)。
+除非就是想通过浏览器地址栏传递 a="1&b=2"这类参数值，form下的自动编码不存在该问题。
+
+获取参数页面中，不需要自己做url解码，各种方法如下：
+
+1.使用浏览器url地址栏传递参数（等同form里使用get方法）
+   (1)由tomcat做自动解码
+在tomcat配置文件server.xml中（如eclipse环境下，对应的则是server下的配置文件）加入URIEncoding="GBK"或"utf-8"就可以直接使用 request.getParameter("xxx")得到中文参数值
+如下：
+       <Connector URIEncoding="GBK" compressableMimeType="text/json,text/html,text/xml,application javascript,text/javascript,text/css,text/plain,application/json" compression="on" compressionMinSize="2048" connectionTimeout="20000" maxPostSize="8000000" noCompressionUserAgents="gozilla, traviata" port="8080" protocol="HTTP/1.1" redirectPort="8443" useSendfile="false"/>
+所有页面编码要与URIEncoding一致,url里的参数由tomcat按URIEncoding的设置自动做url解码（下文post参数不受URIEncoding影响，不会被tomcat自动解码）。
+
+   (2)由程序做汉字解码
+如果不设置URIEncoding则默认为ISO-8859-1编码，需要对获取到的参数使用new String(参数.getBytes("iso-8859-1"),"gbk or utf-8") 才能获得中文。如书上例6.4。
+
+如已经设置URIEncoding为gbk或utf-8，再用该方法反而把正确的中文弄成乱码
+
+下文的request.setCharacterEncoding("gbk or utf-8")只对post的参数有效，对url传递过来的参数无效。
+
+2.form里使用post方法传递参数
+    request.getParameter("xxx")之前加上request.setCharacterEncoding("gbk or utf-8")，或者之后用new String(参数.getBytes("iso-8859-1"),"gbk or utf-8")进行处理，两者用其一即可获取正确的中文参数（不能两者都用）
+         
+
+request.setCharacterEncoding("gbk or utf-8")只对post的参数有效，对
+url传递过来的参数无效。post方法不受server.xml中URIEncoding的设置影响，换言之，URIEncoding会对url数据做自动url解码，但不会对post的数据做自动解码。
+
+
+综上，建议所有页面使用utf-8编码，能用post传参数都用post,在tomcat配置文件server.xml中加入URIEncoding="utf-8"(这样可以支持中文路径和文件名)。实验提交的文件都要满足上述设置下能正常使用。
+
+    

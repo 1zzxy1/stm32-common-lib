@@ -1,0 +1,21 @@
+tomcat下webapps下目录结构
+
+app1/WEB-INF/classes/com/xxxx/x.class
+app1/*.jsp
+
+如果jsp在子目录x里则
+app1/WEB-INF/classes/com/xxxx/x.class
+app1/x/*.jsp
+即javabean位置不随jsp文件位置改变。x.class可以是bean，也可以是servlet
+
+web.xml放入/WEB-INF目录下,存放配置信息。
+
+新添加（编译）class，或删除class，一般需要重启tomcat才能生效。
+
+命令行编译不需要额外包的javabean，设源文件名为x.java,命令如下
+javac com\xxxx\x.java
+
+命令行编译servlet，设源文件名为ttt.java,命令如下
+javac -classpath e:\servlet-api.jar com\xxx\ttt.java
+类似servlet-api.jar这类库文件，在tomcat的lib文件夹下有，引用目录里不能有空格。
+也可以去掉-classpath参数，此时需要把该jar解压后保留其原目录结构放到默认jdk的Lib目录下（环境变量classpath里设置在其他位置似乎不好用）

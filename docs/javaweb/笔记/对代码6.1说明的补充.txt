@@ -1,0 +1,12 @@
+对代码6.1说明的补充
+1.页面间传递数据有两种方式
+   1）通过url参数（需手动对参数值做URL编码）
+   2）通过form做post(通过form做get和url参数用法一致，只是不需要手动做url编码，form会自己做url编码后再发送)
+2.解码分两层
+第一层是做url解码，由Tomcat依据URIEncoding的设定自动做，所以URIEncoding要和提交页的设定一致或使用默认的iso-8859-1。
+第二层是做汉字解码（gbk或utf8）
+   1）自己通过getBytes和new String转换汉字编码，常用于非form传递方式或未设置URIEncoding(在server.xml里不设置则默认为iso-8859-1)。
+   2）通过request.setCharacterEncoding指定请求中的汉字编码，汉字编码会自动转换。
+对原文档中说明需要补充更正的是：第二种方式对传递数据的两种方式都有效，但需要在server.xml中设置URIEncoding="编码"的支持。建议采用第二种方式，server.xml中把编码方式和所有页面的编码统一设为gbk或utf-8，此时不论Url参数或post参数都会自动由tomcat做url解码；server.xml里不设置则为iso-8859-1，只能用第一种方式处理汉字。(可理解server.xml中URIEncoding的设定可以让tomcat自动对url参数和form参数进行url解码转化。eclipse环境下修改的是左侧项目栏servers里的server.xml文件)
+
+url编码和解码一般只会出现在存取cookie的时候，传递参数的时候只要设定一致的编码一般都会自动完成编解码，不需要主动去做。

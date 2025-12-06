@@ -1,0 +1,184 @@
+第11章 EL表达式语言
+EL是expresson language的缩写，在jsp2.0里引入。EL表达式可以看成jsp的标签，用来简化代码。事实上jsp页面里的标签最终都要翻译成java代码，采用标签可以简化代码，在形式上更好实现界面与代码分离。
+
+${变量名}可以直接在页面输出存储在服务器端的变量（如果page,request,session,application范围内存有该变量）。javabean对象其实也是存储在服务器端，id就是其变量名，也可以通过代码和EL表达式进行存取。
+例子11.6就是通过EL输出javabean对象里的信息。
+
+代码 11.1使用了一个字符串数组和N个整型变量（存储在request范围内），然后用EL进行输出。
+
+Jsp里不使用EL表达式（把表达式原样输出）有3种方法：可以前面加\，可以通过page指令禁用，也可以通过web.xml配置。
+
+EL不能使用保留关键字。
+代码11.2和11.1类似，只是字符串数组变量存储在session里。
+
+代码11.3演示的是EL中布尔值的输出。
+
+通过pageContext可以在EL表达式中获取一些JSP内部对象（如page,request,session,exception，out）,application,config不能通过pageContext获取，但servletContext可以通过pageContext获取，有servletContext也就有了application。
+
+pageScope.变量名，requestScope.变量名，sessionScope.变量名，applicationScope.变量名,可以在EL表达式里获取指定范围内的变量。前面不指定变量范围时，按范围从小到大查找变量。
+代码11.4演示了Page范围内javabean对象的获取
+
+
+EL还可以用${param.name}获取提交过来的参数，提交过来的参数是数组时（比如通过复选框批量删除），用${paramValues.name[i]}获取数组中第i个值。
+
+代码11.5演示了使用${initParam.company}获取出定义在web.xml里的名为company的初始变量值。
+
+EL还有 header对象， headerValues对象，cookie对象等。
+
+E还可以自定义标签及其对应的方法（通过标签定义文件进行关联），有兴趣的可以自己看看。
+
+
+第12章 JSTL标签
+
+这是个标签库，需要引入Jar包，用标签来替代程序代码，方便jsp编程及界面代码分离。如赋值，输出，流程控制，数据库操作等，都可以用标签替代代码，有兴趣的自己看看其他参考书，书上这一章内容只是其中很少一部分。
+
+
+各种java web框架可以暂且理解为 自定义标签及方法，相应配置文件，一定格式的servlet相结合，方便编程人员编程。 
+
+第13章 AJAX技术
+
+1.AJAX意思: 异步java与xml
+2.AJAX作用：局部刷新页面，不是新技术，是多种技术相结合。
+            用到javascript, xhtml，css, xml，xmlhttprequest(一个activex控件，ajax的核心)等。
+3.早期实现局部刷新，可使用框架(frame)和iframe，靠多个页面组合在一起呈现局部刷新。
+  可以用该方法实现无刷新聊天室。
+4.使用xmlhttprequest实现局部刷新
+  见例子（把以下代码另存为xxx.htm用IE运行）。(需要IE设置允许运行active控件)
+  在客户端  javascript中利用xmlhttprequest对象和服务器通信，收回的信息用javascript显示在页面上，实现页面的无刷新。  
+具体代码如下：(下例IE浏览器可用，非IE浏览器不可用。下例创建的active控件只针对IE，通用的创建方法请参照书上例子)
+
+  <html>
+    <head>
+        <title>Ajax Internet Explorer Flavor</title>
+        <script language="javascript">
+            var dom = new ActiveXObject('MSXML2.FreeThreadedDOMDocument.3.0');
+            var objXMLHTTP = new ActiveXObject('Microsoft.XMLHTTP');
+
+            /*
+            从服务器获取XML文档
+            */
+            function initialize() {
+                
+            }
+            /*
+            处理XMLHTTP请求的应答
+            */
+            function stateChangeHandler() {
+                if (objXMLHTTP.readyState == 4)
+                    try {
+                        dom.loadXML(objXMLHTTP.responseText);
+                        document.getElementById('time').innerText =
+objXMLHTTP.responseText;
+                    }
+                    catch (e) { }
+            }
+            function Button1_onclick() {
+                var strURL = 'http://www.dlu.edu.cn';
+
+                objXMLHTTP.open('GET', strURL, true);
+               //如果是post则要向下面一样自定义http头
+               // objXMLHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                objXMLHTTP.onreadystatechange = stateChangeHandler;
+
+                try {
+                    objXMLHTTP.send(null);//post则null换为提交的信息
+                }
+                catch (e) {
+                    alert(e.description);
+                }
+            }
+
+        </script>
+  </head>
+  <body onload="initialize()">
+    <div id="time"></div>
+      <p>
+          <input id="Button1" type="button" value="button" onclick="return Button1_onclick()" /></p>
+  </body>
+</html>
+
+5. AJAX不是java web专有，只要可以用来做web的语言都支持，如.net，asp，php，perl等也都可以。因为xmlhttprequest是浏览器端对象，与服务器端脚本无关。有了xmlhttpresquest就可以实现局部刷新，但要注意不同浏览器在该activex控件的创建上有所不同。(上例代码只针对IE)
+
+
+
+总结：XMLHttpRequest对象可以看成是嵌在浏览器里的一个不可见控件，能够访问（get）某个Url或者向某个Url提交（post）数据，并且能够通过回调函数对接收到的回复进行处理，可在javascript里实现与web服务器的交互和网页的局部刷新。AJAX属于客户端技术，与服务器端使用何种语言无关，但不同浏览器创建该对象的方式有所不同，需要在javascript里判断浏览器类型，然后再创建该对象。浏览器客户端有很多框架，许多框架对XMLHttpRequest做了二次封装，XMLHttpRequest需要浏览器设置为允许activex。
+
+这一章的部分源代码在import到eclipse后，在add library里除了jre system library,还需要添加server runtime。（如果因为版本问题直接导入不行，就新建项目然后逐个文件拖进来）
+
+代码13.1演示了如何判断一个新注册用户名是否可用，把用户名通过xmlhttprequest发送给服务器端，然后服务器端检查是否有重名，然后把检查结果反馈给客户端，客户端显示该结果。
+如果eclipse自带浏览器不能显示图片就用chrome浏览器。
+提示信息通过一张背景图片显示成特殊形状。
+如果server.xml里在设置端口号的行对编码没有进行设置或设置了URIEncoding="iso-8859-1"，则13.1对中文用户的检测没有问题。如果server.xml里在设置端口号的行设置了URIEncoding="UTF-8"，则对中文url参数的提取将出现问题，具体原因和解决方法如下。（设置了URIEncoding="GBK"一样会有问题，代码里把参数值从iso8859转gbk那行去掉就可以了，因为此时tomcat已经自动做了这件事，再做一次反而会出问题）
+
+
+如果server.xml里在设置端口号的行设置了URIEncoding="UTF-8"，则
+1）发送时主动对提交的参数做utf8方式的url编码
+2）接收参数的页面做request.setCharacterEncoding("utf-8");不再用重组字符串的编程方式进行处理
+
+以下是具体解释
+
+通过前面的学习应该知道url里不能有中文和特殊字符，客户端应该做url编码后再发送（这种编码通常会自动做，有utf8和gbk两种，也可以主动去做。js的url编码函数有多种，自己百度, 以下用的这种是做utf-8方式的url编码，这里如果不主动编码会按页面编码方式按gbk方式进行编码，而服务器端tomcat会按URIEncoding="UTF-8"自动对url参数做utf8方式解码，这就导致url参数是汉字时实际提取了乱码，存在同汉字名用户也就检测不出来了），改为
+createRequest('checkUser.jsp?user='+encodeURIComponent(userName.value));
+服务器端也相应改为
+request.setCharacterEncoding("utf-8");//这句可以注销
+//如果server.xml里在设置端口号的行设置了URIEncoding="UTF-8"，tomcat对url里的值进行解码时自动按server.xml里设置的编码方式，不设置则默认按iso8859-1方式。request.setCharacterEncoding事实上对url参数的解码不起作用可以省略（只对post数据解码起作用）。
+String user=request.getParameter("user");
+//如果server.xml里在设置端口号的行设置了URIEncoding="UTF-8"，则tomcat默认对所有url参数里传来的值自动做了utf-8方式的url解码，所以url参数里按照gbk编码的参数值经历tomcat自动解码后无论在后续代码里如何接收都会是乱码，此时Url参数需要做utf8方式的url编码才能在接收时避免乱码。
+//tomcat对url中参数的自动解码不受request.setCharacterEncoding影响，只受配置文件里的设置影响；tomcat对post数据的自动解码始终是按照ISO8859-1，受request.setCharacterEncoding影响，
+
+发送的url请求及数据可以通过fidder抓包来验证，服务器端解码回复也可以通过抓包验证(或使用System.out.println将获取到的参数或者回复的信息输出到控制台窗口进行观察)。涉及中文的问题各种各样，没有统一的理论解决方法，但一些基本规律需要掌握：
+1.url和post的数据，一般都要发送前做url编码；
+2.url编码有utf8和gbk两类，导致汉字被编成三个字节还是两个字节，解码也要与之匹配；
+3.接收端接收数据一般要做request.setCharacterEncoding("gbk或utf-8")，尽量少用代码直接去转换编码这种方式。
+
+汉字方面的显示或匹配都有可能出问题，在掌握以上规律基础上可通过抓包，修改程序，再次验证来解决问题，这才是真正通用的解决问题的办法。
+
+
+
+
+代码13.2把与xmlhttprequest有关的代码封装到一个单独的js文件里(定义成了类)，然后再去调用其中的方法。
+主页的js里通过定时器每隔600秒，也就是10分钟去调用一个getInfo方法，getInfo方法里定义了服务器端url,定义了提交方式，定义了回调函数为deal_getInfo，定义了处理错误的函数为onerror，这些都作为参数传递给了单独js文件里的AjaxRequest方法，实现了AJAX,每隔10分钟读取服务器端数据库里的内容并显示。
+
+这个例子的运行需要有相应数据库。源码里有.sql文件，有兴趣的自行导入mysql后运行，导入方法见前文数据库部分。
+为防止读取的是缓存数据，可以在链接后面加上时间戳，这里时间戳的作用就是让url不同来避免获取到缓存里的旧数据。
+
+
+代码13.3没用到数据库，可以直接运行（若自带浏览器不好用请使用chrome）。servlet接收两种参数，一种会发送所有省份名称，一种发送某个省里所有城市名称。注意和13.1同样问题，tomcat会对url参数按tomcat里的配置自动进行url解码，按server.xml默认编码配置13.3没有问题，但如果配置了URIEncoding="UTF-8"，那么这个程序就有问题了，因为通过url参数传递的省名不会被正确接收，解决方法与13.1一样，主动对url参数进行utf8方式的url编码；接收参数的页面做request.setCharacterEncoding("utf-8");不再用重组字符串的编程方式进行处理。
+
+
+代码13.4的第三方Jar包里缺少需要import的类，以前讲过servlet3.0实现文件上传的办法，这里就不具体看这个用第三方jar的例子了。这里是要实现实时显示文件上传进度的进度条，在循环写入服务器端文件时把已写入的大小与文件总大小的比存入session，客户端js里每隔一段时间用xmlrequest获取session的值，然后依据该值动态改变一个有背景色的客户端元素的长短就可以了。
+
+
+
+代码13.5-13.7是书后题。
+
+13.5是页面显示当前时间，这种功能可以用js完成，获取客户端时间显示。这里是xmlrequest获取服务器端时间，然后显示到某个客户端元素上。
+13.6用到了数据库，每隔一段时间按添加时间从后先前把select出来的数据显示出来。如果再有个添加数据的页面，这个程序也可以看成是个聊天室。
+13.7也用到数据库，鼠标移到某个页面元素上就从数据库里读取一段说明进行提示。
+
+
+
+关于java web编程中汉字编码的说明
+会出现用到汉字编码的几处地方：
+1.cookies值：cookie里不能存放汉字，因此在存放汉字的时候要主动做url编码，url编码有utf8和gbk两种，存放前编码，提取后解码，编解码要一致。
+2.url参数值：要做Url编码，特殊字符需要（如&=?空格等），汉字也需要。其中汉字通常会自动做编码，而主动编码可以去选择utf8或gbk。tomcat配置文件server.xml里的URIEncoding设置会让web服务器对url参数自动做url解码（汉字将有3种解码方式,iso8859,utf8,gbk，汉字如果按8859自动解码后还需要用代码去按编码方式转码，按后两种自动解码的情况下URIEncoding设置决定了所采用的编码方式），request.setCharacterEncoding语句影响不到Url参数的解码。
+3.post数据值：自动做url编码，gbk还是utf8视页面编码而定；tomcat在服务器端自动按iso8859解码，request.setCharacterEncoding后可以直接提取其值，也可以用代码转编码，两种方式一般都可以。
+4.url里出现中文路径或文件名：要做gbk或utf8编码，视server.xml里的URIEncoding如何设置，另外空格要换成%20(编码后就是+换%20)，一般只需编码不再需要解码。
+
+
+
+补充几个例子（如果因为版本问题直接导入不行，就新建项目然后逐个文件拖进来）
+1.图片验证码
+verification_code-master.zip,解压后在eclipse for jee导入。这个例子的jre library需要使用jre8(也可以properties里的jre，java compiler连同project facets一起改成1.7版)，例子里还使用了jquery，通过二次封装方便了页面元素的获取和设置，也方便了AJAX的使用。例子里用了两个servlet，一个servlet用来把随机验证码存入session并生成图片流（图片流可作为图片文件在img元素里显示，url后加时间戳避免被缓存），另一个servlet验证AJAX提交来的验证码是否正确。这个例子可以加个密码框一起提交验证，成功则跳转到某页，不成功则给出提示仍留在登录页。
+
+2.excel文件的读取
+网站有时需要批量导入功能，用户上传excel表格，然后读取表格内容存入数据库。
+readxls.rar，解压后在eclipse for jee导入。这个例子里的lib目录里已经带了jxl.jar(通过文件管理器拖到项目lib目录里)，这个jar可以处理97-2003版本excel文件的读写，从excel里读出的内容是gbk编码，servlet里response.setCharacterEncoding("gbk")就可以正常显示。
+
+3.excel文件的写入
+这种例子一般是由用户打开一个excel模版文件，然后对这个模版进行修改后另存在自己的目录里生成excel文件（借助jxl.jar写入数据）,然后点链接下载文件或直接生成excel文件流下载。
+例子writexls.rar，解压后在eclipse for jee导入，这个例子里的lib目录里已经带了jxl.jar。注意运行后生成的文件并不在源码目录，而是在server的临时目录里（eclipse工程目录下.metadata\.plugins\org.eclipse.wst.server.core\tmp1\wtpwebapps\writexls）。
+注意代码里sheet.addCell(new Label(0,1,"测试数据2"))表示给当前打开的工作表第0列第1行赋值（先列后行，与数组里的行列概念不同）。
+
+4.二维码的生成
+输入字符串，借助第三方库生成二维码(usezxing.rar)

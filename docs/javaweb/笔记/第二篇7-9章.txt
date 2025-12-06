@@ -1,0 +1,722 @@
+第2篇
+
+第7章 javabean技术
+
+最初jsp把代码和界面混在一起，不方便开发及后续的维护，可以采用javabean使界面和代码一定程度上实现分离。javabean可用在可视化编程和jsp中。jsp里的javabean可以有两类，一类是用来存储数据（可看成是个结构体类型的实例），另一类是用来存放代码，jsp里可以调用其中的方法。
+
+代码7.1
+前面章节的代码只用到了jsp文件和web.xml，本章的代码在项目里新建class文件，然后在jsp文件里<%@page import="com.lyq.bean.Email"%>（package名为com.lyq.bean，类名是Email），就可以在jsp里为这个类创建实例或直接使用类里的静态方法了。这个类的源代码Email.java将在src目录下的com\lyq\bean目录里，编译生成的class文件在build\class\com\lyq\bean目录下。离开eclipse开发环境，以tomcat作为web服务器时，把web.xml，jsp和class文件放到tomcat相应目录里就可以完成web应用的手工部署了。
+
+tomcat里web应用的目录结构和myeclipse项目基本一致，如果使用eclispe for javaee来开发，在tomcat里webapps目录下创建app1目录后，把jsp,class,xml放到相应目录就可以完成部署。假设tomcat里webapps目录下某个web应用在目录app1中，则各类文件放置位置如下：
+app1/WEB-INF/classes/com/xxxx/x.class     （x类定义在com.xxxx包里）
+app1/*.jsp
+app1/WEB-INF/web.xml
+如果jsp需要放到子目录x里则
+app1/WEB-INF/classes/com/xxxx/x.class
+app1/x/*.jsp
+app1/WEB-INF/web.xml
+即javabean或servlet类的位置不随jsp文件位置改变。class文件可能是bean，也可能是后续章节里创建的servlet。web.xml放入app1/WEB-INF目录下,存放配置信息。
+
+eclipse环境下tomcat服务器的临时根目录在workspace路径下的.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps，在这个路径下进入该web应用文件夹，也可以找到这些文件，把这个文件夹拷贝到tomcat里webapps目录下可以免去手动创建目录。
+
+从代码7.1里可以看出来,类的编写和java面向对象时所学过的完全一致，使用这个自定义类时要在jsp页面里<%@page import="com.lyq.bean.Email"%>，然后就可以在jsp里使用Email类了。
+这个例子是在服务器端对用户输入的邮箱地址进行有效性检测，一般来说这种检测除了服务器端处于安全性考虑需要做之外，还应在客户端用js检测以减轻服务器端压力及提高用户使用体验。
+（参照书上例子3.18（代码3.2）和例子3.27(代码3.7)）
+
+代码7.1里对界面和代码的分离不够彻底，如果一个类只是用做结构体存储数据，可以使用jsp标签来避免出现程序代码。因此代码7.2里javabean实例的创建用jsp里的标签来完成，属性的赋值和获取也用jsp标签来完成，后面章节中对javabean也是这样做的，这种能使用jsp标签来创建实例并通过jsp标签来访问属性的javabean类的写法要满足一定条件，一般有如下规定：
+1）类为public类，构造方法无参数
+2）属性为private 类型 xxx
+3）属性的访问方法为public，且读取方法命名为getXxx()（若属性为boolean型，则为isXxx()）,设置方法命名为setXxx(...)
+具体编程时在项目里新建class，如无必要可以不写无参数的构造方法，在源码中加入属性（成员变量），读取和设置方法可以手写，也可以用eclipse自动生成。
+具体操作是定义私有成员变量后，在源程序代码栏 鼠标右键-source-Generater getters and setters就可以自动生成默认的成员方法。
+
+如果没有正确的get方法和set方法，则使用jsp标签时会报错。
+
+在代码7.2的index.jsp中，创建名为produce的javabean实例使用
+<jsp:useBean id="produce" class="com.lyq.bean.Produce"></jsp:useBean>
+获取produce对象名为name的属性值使用<jsp:getProperty property="name" name="produce"/>
+
+代码7.3中使用了设置javabean属性的标签
+<jsp:useBean id="produce" class="com.lyq.bean.Produce"></jsp:useBean>
+<jsp:setProperty property="name" name="produce" value="洗衣机"/>
+这里的value必须是字符串，即使bean类里是int型属性，比如10，也要写成 value="10"
+
+使用jsp标签还可以简化编程，在代码7.4中有如下代码
+<jsp:useBean id="person" class="com.lyq.bean.Person" scope="page">
+	<jsp:setProperty name="person" property="*"/>
+</jsp:useBean>
+scope属性指明person对象的有效范围是本页(默认值就是page，还可以是request,session,application)，并且从前页提交的参数里取值为person的与参数同名的属性赋值。
+property="*"表示所有同名的属性都被赋值（参数里没有的则是默认值或null），也可以把*换成具体属性名，如果参数名称和属性名称不一致，还可以指定参数名,如：<jsp:setProperty name="person" property="sex" param="xingbie"/>。
+
+scope="request"表示该javabean是从转发页面传递过来的，如果没有该id名的javabean被转发过来则新建一个实例。scope="session"表示该javabean是从其他页面传递过来的，如果没有该id名的javabean在session范围被其他页面创建则新建一个实例。scope="application"则可以是其他用户创建的名为该id名的application范围内的javabean实例，不存在则新建一个。jsp标签可以理解为在编译的时候自动被替换成Java代码进行编译，但在编写和维护jsp时可以更加清晰便捷。
+如果不用标签使用java代码实现则是创建类的实例，然后用某个范围内的setAttribute保存，然后在其他页面用getAttribute获取。这种用法在jsp部分也做过，只是这里存取的是自定义的类型，并且代码被标签替代以简化编程。
+
+
+以下代码是在session范围内继承一个实例过来，如果存在该实例则不做赋值，只有在新建时才做第二行的赋值。
+<jsp:useBean id="person" class="com.lyq.bean.Person" scope="session">
+	<jsp:setProperty name="person" property="*"/>
+</jsp:useBean>
+对比如下代码
+<jsp:useBean id="person" class="com.lyq.bean.Person" scope="session">
+</jsp:useBean>
+<jsp:setProperty name="person" property="*"/>
+后一种写法把赋值拿到创建或获取javabean实例后面，则不论是新创建或获取，都要执行这行的赋值操作。这两种写法效果不一样，不要混淆。
+
+
+代码7.5中有两个javabean类，一个用来作为存取数据，另一个提供了方法供jsp调用（这种也叫工具类 javabean）。第一页输入数据并提交，第二页
+<jsp:useBean id="news" class="com.lyq.bean.News"></jsp:useBean>
+<jsp:setProperty property="*" name="news"/>
+建立一个page范围内的javabean并从提交参数里获取属性值。对工具类javabean，则
+<jsp:useBean id="encoding" class="com.lyq.bean.CharactorEncoding"></jsp:useBean>
+<%= encoding.toString(news.getTitle())%>
+以上两行是创建一个工具javabean的实例并调用其中方法。工具类javabean也可以不创建实例，方法声明成静态，然后直接用 <%=类全名.方法名%> 去调用。
+
+代码7.6每隔一秒刷新一次自身<meta http-equiv="Refresh" content="1">，时间和星期几是通过javabean里的方法获取的。
+
+代码7.7中，html里多个同名元素提交的参数值最终形成的是字符串数组，这个例子里的工具类javabean就是把数组合成一个字符串。比如页面上多个复选框一般都采用同一名称，选中项的value合成为数组传递给提交页，bean里相应属性也是数组，获取值后显示出来。
+
+代码7.8，在同一page，先设置bean的值,然后再提取出来。获取属性值可以直接用代码<%=student.getName() %>，也可以使用标签<jsp:getProperty property="name" name="student"/>
+
+代码7.9也是关于javabean，把前页提交的参数传递给第二页，然后显示传递的内容。
+
+代码7.10是个页面计数器，一般页面计数器需要设置一个application 范围的javabean实例，然后每被访问一次把其中一个整数成员变量加1。这个例子里使用的是默认为Page范围的javabean，但javabean类里使用了静态的整型成员变量作为访问次数，因此也能够让所有访问者共享该成员变量的值。这个例子存在一点问题，就是应该在方法前加上同步避免多线程出现的问题。
+synchronized public int getCount(){
+		return ++count;
+	}
+也可以对javabean类和jsp文件作如下修改，用一个application范围内的bean实例实现计数。
+package com.lyq.bean;
+public class Counter {
+	// 次数
+	private int count = 0;
+	// 获取计数器值
+	synchronized public int getCount(){
+		return ++count;
+	}
+}
+
+<jsp:useBean id="counter" class="com.lyq.bean.Counter" scope="application"></jsp:useBean>
+<h2>
+欢迎光临，你是第
+<jsp:getProperty property="count" name="counter"/>
+位来访者。
+</h2>
+
+
+
+第8章 servlet技术
+
+servlet技术早于jsp,事实上jsp首次运行也要先被编译成servlet。java最初用于web服务器端开发使用的就是servlet，servlet需要被编译成class然后放到tomcat相应目录里才有效，jsp可以在首次被访问时进行编译。servlet可看成一个在编写代码时有固定格式要求的java程序，依靠代码向页面输出内容，输出界面时不方便，这才有了后来的jsp技术。servlet比jsp效率高些，网站编程一般都是MVC架构，M是model的意思，数据逻辑模型，本门课里这部分用javabean实现；V是view的意思，指界面，本门课这部分用jsp实现；C是control的意思，流程控制，用代码处理比较复杂的问题，本门课用servlet实现。
+
+servlet和jsp一样，编译后的页面是被多线程访问的单个实例，因此比perl这类脚本程序高效。
+
+例子8.1和8.2在压缩包里没有对应的代码，只要在项目里新建一个servlet就很容易实现一个servlet类。
+建一个新项目，右键项目-new-servlet,然后填写package名和类名，就会在src目录里生成对应的java源文件。在eclipse for javaee(servlet 3.0以上)不需要web.xml文件对servlet进行配置，配置信息会直接以注释（这种注释会编译进类里，运行时jvm会从类中读取）形式出现在java源码里；而在我提供的Myeclipse里则会在web.xml里自动生成servlet配置信息。假设我的项目名是test,servlet类名命名为t，则运行项目会找不到默认页面，需要手动修改浏览器地址栏为http://你的地址：port/test/t就可以运行该servlet。（Url mapping决定servlet对应的url链接，在生成servlet过程中默认是类名，如果此步改成其他值，那就按改过的值来访问；使用Myeclipse开发，打开web.xml可以看到该项设置默认是什么）
+
+自动生成的代码类似例8.1里的代码结构，一般只需要为doGet或doPost其中一个方法补充代码即可。
+例8.2里的servlet继承的是Servlet接口，而不是HttpServlet接口（自动生成的代码也继承这个接口），两者需要实现的接口方法不同，我们只需要掌握后者。
+
+Servlet中需要掌握的一些类和方法见8.1和8.2中的表格，这些用到了再参考这些表里的内容。
+
+代码8.3中的web.xml如下：
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <servlet>
+    <servlet-name>MyServlet</servlet-name>
+    <servlet-class>com.lyq.MyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MyServlet</servlet-name>
+    <url-pattern>/servlet/MyServlet</url-pattern> //支持模糊映射，如/servlet/*
+                                                  //则无论访问/servlet/下什么都执行该servlet类
+                                              //这里表示的只是url里的路径，不一定真实存在该路径
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>servlet/MyServlet</welcome-file>
+  </welcome-file-list>
+</web-app>
+关于该段配置说明如下:
+1)<servlet>...</servlet> 里定义了一个名为MyServlet的servlet，其对应的是com.lyq.MyServlet类。
+2)<servlet-mapping>...</servlet-mapping>里通过servlet名把该类的访问链接配置为 /servlet/MyServlet，即用户访问http://地址:port/项目名/servlet/MyServlet就可以执行com.lyq.MyServlet类。
+3)<welcome-file-list>... </welcome-file-list>里定义了默认首页是http://地址:port/项目名/servlet/MyServlet，执行这个项目也就是执行了这个servlet。一个网站应用可以定义多个默认首页，依次查找直到找到一个匹配的。
+
+servlet除了定义到一个servlet类上，还可以定义到一个jsp文件上，jsp可看作最终也被编译成servlet。
+<servlet>
+    <servlet-name>MyServlet</servlet-name>
+    <jsp-file>login.jsp</jsp-file>
+</servlet>
+
+另外一个servlet在定义的时候可以定义一些初始参数，比如：
+<servlet>
+.....
+  <init-param>
+    <param-name>count</param-name>
+    <param-value>0</param-value>
+  </init-param>
+.....
+</servlet>
+jsp里的内部对象config可以使用config.getInitParemteter("count")获取出来这个值。对于servlet，一般在servlet的init方法的参数里获得config对象，然后用getInitParameter方法提取。
+    servlet如果设置了load-on-startup,则在服务器启动后运行init（0是立即启动，值越小启动优先级越高，可设置此值控制每个servlet随web服务器启动的次序），如果不设置或此值为负，则不随web服务器启动，在被调用时init才会执行一次且仅执行一次。如下配置会使该servlet随web服务器启动，优先值是5。
+<servlet>
+    <servlet-name>MyServlet</servlet-name>
+    <servlet-class>com.lyq.MyServlet</servlet-class>
+    <load-on-startup>5</load-on-startup>
+ </servlet>
+
+在代码8.3的Myservlet.java里，doGet方法里可以看到
+public void doGet(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+	response.setContentType("text/html");
+	response.setCharacterEncoding("GBK");
+	PrintWriter out = response.getWriter();   //使用PrintWriter需要import java.io.*
+	out.println("。。。。");
+。。。。
+
+这里针对get方法给予了响应，response和request可以从方法的参数里获得，out内部对象获取后就可以进行输出。前面章节里已经提到如何在servlet里获取jsp中各种内部对象，有了这些内部对象，就可以把jsp部分的编程用到servlet里。html界面需要通过out对象输出，比较繁琐。
+
+代码8.3的CharFilter.java定义了一个过滤servlet（过滤器）。过滤器和监听器也是servlet，第9章有详细介绍。
+
+一般servlet的doGet和doPost方法只需要具体实现一个，另一个在方法里直接调用有具体实现的这个就可以。在创建servlet时可以勾选需要具体实现的方法，也可以直接在代码里手工添加方法。Myservlet.java可以添加如下doPost方法，这样对该servlet无论get或post方法都可以有同样的响应。
+public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	doGet(request, response);
+}
+
+表单除了向jsp提交外，也可以向servlet提交，form里的action设置为servlet映射的地址即可，然后就可以在doPost或doGet方法里获取jsp里request,response,cookie，session,application等对象进行编程。
+
+servlet在doPost或doGet方法中向其他jsp页面或servlet也可以做转发，方法如下：
+javax.servlet.RequestDispatcher dis=request.getRequestDispatcher("/index.jsp");
+dis.forward(request, response);
+这种转发可以在request范围内传递信息。
+
+前面学习jsp部分已经提到servlet里如何获取jsp里能直接使用的常用的内部对象，这里再重复一遍：
+
+1）request和response可以直接从servlet方法里的参数获取，如果某些方法里(比如过滤器)的参数不是javax.servlet.http.HttpServletRequest和javax.servlet.http.HttpServletResponse类型则需要强制类型转换。
+
+2）jsp部分所学的内部对象原有的方法仍可以用，如request.getParameter可获取提交参数......
+
+javax.servlet.http.Cookie[]  cookies = request.getCookies()可获取所有cookie，
+
+javax.servlet.http.HttpSession session = request.getSession()可获取session对象，
+
+javax.servlet.ServletContext application = request.getSession().getServletContext()可获取application，servlet3.0以上还支持用request.getServletContext()获取，
+
+java.io.PrintWriter out=response.getWriter()可获取out对象
+
+javax.servlet.jsp.PageContext pageContext =javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true, 8192, true) 可获取pageContext对象
+
+3）javabean定义的类在servlet里也可以使用。和java编程一样，import 自定义类，用new创建类的实例，实例的属性可以通过代码读取和修改，实例可以用 内部对象.setAttribute(name,object)写入 request，session，application， 也可以用 内部对象.getAttribute(name)读出来（读出来的需要强制类型转换）。
+（一句话总结：servlet里只能用代码，不能使用jsp里的标签，但javabean仍可以看作一个自定义的类在servlet里使用，另外jsp里可以直接使用的内部对象在servlet里需要自己获取）
+
+为代码8.3新建一个servlet，这个新servlet因为是servlet3.0不需要往web.xml里添加配置，但会使原来的web.xml提示错误。错误提示为“Attribute "xmlns" was already specified for element "web-app"”，意思是xmlns部分出现了重复，把xmlns(web.xml第二行)里重复部分去掉，或在新建servlet之前先把原来web.xml第二行存到别处，添加新servlet后再用原第二行替代后来出错的第二行即可。替换后需要save all后错误标记才会消失。新的servlet源文件里有注释@WebServlet("/xxx"),这个注释就相当于web.xml里以下部分
+(假设新建的这个servlet名称是MyServlet2，类全名是com.lyq.MyServlet2，servlet3.0源程序里的@WebServlet("/xxx")就起到了web.xml里如下这几行配置的作用)
+<servlet>
+    <servlet-name>MyServlet2</servlet-name>
+    <servlet-class>com.lyq.MyServlet2</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>MyServlet2</servlet-name>
+    <url-pattern>/xxx</url-pattern>    
+</servlet-mapping>
+如果通过web.xml配置servlet，可以把servlet里的注释部分去掉避免两种设置有冲突。
+
+
+代码8.4是向servlet提交数据的例子，index.jsp是gbk编码的，因此在servlet里要有如下两行
+response.setCharacterEncoding("GB18030"); //这样设置后本页可以输出中文
+request.setCharacterEncoding("GB18030");  //这样设置后可以提取前页post过来的中文内容
+代码8.4运行后会发现html部分按原文字输出到页面，并没有由浏览器进行解释，这是因为少了一行
+response.setContentType("text/html");，这一行是必须的，需要输出时最先执行。
+在servlet里获取提交数据，输出中文，输出界面，要注意不能缺少以上3行。
+
+out.flush();out.close();最后这两句代码不需要也能正常运行
+
+代码8.5和8.4类似，也同样缺少了response.setContentType("text/html")
+
+代码8.6是一个简易的web计算器。这个例子使用客户端js来检测用户输入和运算符，然后向servlet提交这两个数字和运算符，servlet里转为数字，按运算符计算，然后输出算式和结果。
+
+
+对于接收信息并显示处理结果的动态页面（jsp或servlet），一般都有如下处理（假设用的是gbk）
+response.setContentType("text/html; charset=GB18030"); //必须有text/html浏览器才能解释Html标签
+response.setHeader("Pragma", "no-cache");  //以下3行是为了避免缓存，动态页面被缓存有时有问题。
+response.setDateHeader("Expires", 0);
+response.setHeader("Cache-Control", "no-cache");
+response.setCharacterEncoding("GB18030"); //这样设置后本页可以输出中文
+request.setCharacterEncoding("GB18030");  //这样设置后可以提取前页post过来的中文内容
+
+
+第9章 过滤器和监听器
+
+一、过滤器
+
+过滤器也是一种servlet，eclipse for java里右键项目-new-filter，就可以创建过滤器。我所提供的Myeclipse没有这个新建项，只能建立普通servlet后再对源码进行修改。
+过滤器经过配置可以对某些Url起过滤作用，即request先经过过滤器再送到目标url，对方的response也要先经过该过滤器，才发送回客户端。针对同一url的过滤器可以嵌套多个，按web.xml里定义的次序，请求先流经前面定义的，后流经后面的；而流回客户端的响应信息则流经次序相反。
+
+新建filter,配置文件web.xml里设置filter-mapping就是设置需要被加载过滤器的url。
+
+代码9.1为index.jsp添加了过滤器，web.xml中过滤器的设置如下：
+	<filter>
+		<!-- 过滤器的名称 -->
+		<filter-name>CountFilter</filter-name>
+		<!-- 过滤器的完整类名 -->
+		<filter-class>com.lyq.CountFilter</filter-class>
+		<!-- 设置初始化参数 -->
+		<init-param>
+			<!-- 参数名 -->
+			<param-name>count</param-name>
+			<!-- 参数值 -->
+			<param-value>5000</param-value>
+		</init-param>
+	</filter>
+	<!-- 过滤器映射 -->
+	<filter-mapping>
+		<!-- 过滤器名称 -->
+		<filter-name>CountFilter</filter-name>
+		<!-- 过滤器URL映射 -->
+		<url-pattern>/index.jsp</url-pattern>
+	</filter-mapping>
+过滤器部分关键源码如下：
+@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		// 获取初始化参数
+		String param = filterConfig.getInitParameter("count");
+		// 将字符串转换为int
+		count = Integer.valueOf(param);
+	}
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		// 访问数量自增
+		count ++;
+		// 将ServletRequest转换成HttpServletRequest
+		HttpServletRequest req = (HttpServletRequest) request;
+		// 获取ServletContext
+		ServletContext context = req.getSession().getServletContext();
+		// 将来访数量值放入到ServletContext中
+		context.setAttribute("count", count);
+		// 向下传递过滤器
+		
+		//在chain.doFilter之前处理的是客户发出的请求，本例没对请求进行处理
+		chain.doFilter(request, response);//把request发向下层过滤器或目标url，然后等待下层的处理，response返回下层的响应
+		//在chain.doFilter之后处理的是回复客户的响应内容，本例没对响应进行附加处理
+	}
+
+设置这个过滤器后，则每次访问index.jsp都要经由filter过滤，这个过滤器起到网页访问计数器的作用，index.jsp中输出访问次数：
+	您是本站的第【 
+	<%=application.getAttribute("count") %>
+	 】位访客！
+
+
+代码9.2对web应用中所有页面的访问都加上了过滤器，过滤器为请求中的post数据设置汉字编码，为响应设置汉字编码。过滤器主要代码如下：
+public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		// 判断字符编码是否为空
+		if(encoding != null){
+			// 设置request的编码格式
+			request.setCharacterEncoding(encoding);
+			// 设置response字符编码
+     			response.setContentType("text/html; charset="+encoding); //这句放到chain.doFilter后面无效，设置响应头要在产生响应数据之前做
+		}
+		// 传递给下一过滤器或目标url
+		chain.doFilter(request, response);
+	}
+web.xml里定义了一个servlet用于接收提交数据并显示，定义了一个过滤器做请求和响应的汉字编码。
+过滤器部分配置如下
+<filter>
+	<!-- 过滤器名称 -->
+	<filter-name>CharactorFilter</filter-name>
+	<!-- 过滤器的完整类名 -->
+	<filter-class>com.lyq.CharactorFilter</filter-class>
+	<!-- 初始化参数 -->
+	<init-param>
+		<!-- 参数名 -->
+		<param-name>encoding</param-name>
+		<!-- 参数值 -->
+		<param-value>UTF-8</param-value>
+	</init-param>
+</filter>
+<!-- 过滤器映射 -->
+<filter-mapping>
+	<!-- 过滤器名称 -->
+	<filter-name>CharactorFilter</filter-name>
+	<!-- URL映射 -->
+	<url-pattern>/*</url-pattern>
+</filter-mapping>
+
+在servlet3.0中，也可以不用web.xml来配置过滤器，只要在过滤器类前加上
+@WebFilter(filterName="name1",urlPatterns = { "/index.jsp" })
+就可以了，这里起作用的只是指定url的第二个参数，如果多个过滤器加在一个URL上，则按过滤器的类名称来排序，注意不是filterName，而是源程序里的类名。比如一个过滤器class类名叫Ab，另一class类名叫Bb，则请求包先经过 Ab，再经过Bb，响应包则相反。
+
+使用过滤器可以对整个web应用的页面都进行过滤，如果从request里获取的目标页是登录页或验证登录页则放行，如果是其他需要登录才能查看的页面则查看session中是否已存有用户名，有的话放行，没有表示没登录则转发或跳转到登录页，session在登录验证页进行设置。
+过滤算法大致如下：
+@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		
+		
+		HttpServletRequest req = (HttpServletRequest) request;
+		
+		if(req.getRequestURI().endsWith("login.jsp")){//这里只放行登录页，还应该放行登录验证页,通过Url里的文件名进行判断
+			
+			chain.doFilter(request, response);//向下层转发，相当于放行
+		}else{
+			if(req.getSession().getAttribute("usr")==null){ //对其他页如果没登录则转至登录页，通过session里的信息进行判断
+				javax.servlet.RequestDispatcher dis=request.getRequestDispatcher("/login.jsp");
+				dis.forward(request, response);
+			}else{  //对其他页如果已登录也放行
+				chain.doFilter(request, response);
+			}
+		}
+		
+	}
+
+过滤方法里的转发语句也可以换成跳转语句（ServletRequest和ServletResponse一般需要强制转化成HttpServletRequest和HttpServletResponse，后者应用广，支持的方法多。）
+HttpServletResponse res=(HttpServletResponse)response;
+		res.sendRedirect("login.jsp");
+注意转发Url里的/代表的是web当前应用的根目录（在这个程序里加不加都行）， 跳转里的/代表整个网站的根目录（这个程序里不能加）。暂且理解为和servlet相关的/代表当前应用根目录，无关的代表整个网站根目录，/代表的目录有两种可能有时也会带来问题。
+
+过滤器里还可以对允许访问的IP地址进行设定，不允许的ip则跳转到某个固定页面。
+过滤器对request或response里的内容可以过滤替换，比如敏感词的过滤等，这个在过滤器上实现有些麻烦，而由提交页面对post内容进行替换就比较简单，因此这里不再赘述。
+
+
+二、监听器
+
+Servlet监听器是Servlet规范中定义的一种特殊类，用于监听ServletContext、HttpSession和ServletRequest等域对象的创建，重新赋值与销毁事件，以及监听这些域对象中属性发生修改的事件。
+
+监听对象：
+
+1、ServletContext：application，整个应用只存在一个
+
+2、HttpSession：session，针对每一个对话
+
+3、ServletRequest：request，针对每一个转发
+
+监听内容：创建、销毁、属性改变事件
+
+监听作用：可以在事件发生前、发生后进行一些处理，一般可以用来统计在线人数和在线用户、统计网站访问量、系统启动时初始化信息等。
+
+监听器的基本使用
+
+创建步骤：
+
+1、创建一个实现监听器接口的类
+
+   在eclipse的项目里新建listener类
+
+2、配置web.xml文件，注册监听器
+
+  <listener>
+    <listener-class>完整类名</listener-class>
+  </listener>
+
+监听器的启动顺序：按照web.xml的配置顺序来启动
+
+加载顺序：监听器>过滤器>Servlet
+
+编程时主要用到的就是给session过期事件加上处理代码。
+
+书9.2.1-9.2.5对这几种接口及其中的抽象方法提供了说明，监听器类就是继承其中一个或多个接口并为其中的抽象方法提供代码。
+
+监听器类在eclipse for javaEE里很容易添加： 项目右键-new-listener,填写包名和类名，然后下一步有各接口的说明和接口名，可以勾选继承哪个接口，也可以同时继承多个接口，然后在源程序里为具体事件添加代码就可以了。
+
+代码9.3用到了一个过滤器和两个监听器，还有一个类（类里有静态成员变量用来存储在线人员名单）。
+1）过滤器CharactorFilter用来处理中文输入输出，前面已有不再赘述；
+2）监听器MyContentListener是用来监听application变化的，网站启动和关闭时执行其中的方法，这里是空方法，所以实际上在程序里没起作用。
+3）UserInfoList是一个自定义类，类里有一个静态成员变量，类型仍是这个自定义类，另一个成员变量是个列表类型，用来存储在线人名单。利用静态成员变量里的列表使所有人共享在线名单列表。
+4）监听器UserInfoTrace是用来监听session范围内的信息变化的，每当有人在session里存入监听器对象或解除监听器对象都会执行其中的方法。
+
+用户能创建或修改session里的信息，但不能确保用户会主动删除session里的信息（比如网页聊天室里用户可以点离开按钮，也可以直接关闭浏览器），因此对session信息变化进行监听主要就是监听session过期（和删除session信息对应同一事件），在这一事件中可以把在线名单中的自己删去。
+代码9.3把这个监听器类的实例存到了session里，HttpSessionBindingListener接口形成的监听器类必须存入session才能进行监听，而且只能监听自身。单纯从添加web应用的事件处理角度来说，可以使用HttpSessionListener和HttpSessionAttributeListener接口创建监听器类，不需要把监听器类实例化。
+5）为了让session早点失效看到运行结果，把session过期时间设为10秒，即10秒内不访问同站点其他网页session就过期，就可以看到debug窗口里输出的下线信息。index.jsp是登录页，showUser.jsp是创建session新信息（将被UserInfoTrace监听到），loginout.jsp是删除sesseion信息或使session失效（将被UserInfoTrace监听到）。showUser.jsp取list里静态成员变量（也就是名单列表）来显示。实测虽然把session过期时间设为10秒，但实际上触发事件的时间可能远比10秒大。
+
+
+监听器其他接口都不常使用，且有其他解决方法代替，所以对application和request的监听意义不大。给用户的session过期失效添加处理事件是监听器的主要用法。
+
+web.xml对监听器的配置部分如下
+<listener>
+	 <listener-class>com.listener.MyContentListener</listener-class>
+</listener>
+继承HttpSessionBindingListener接口的监听器不需要web.xml里配置，继承自其他接口的监听器则可以仿照这种写法添加到web.xml中。servlet3.0也可以不使用web.xml，在监听类前加@WebListener（eclipse for Java ee就是这么做的）
+
+代码9.3的web.xml里下面一段配置起 预编译jsp文件的作用(部署时就生成class),可以删去。
+<servlet>
+    <description>Added by JBuilder to compile JSPs with debug info</description>
+    <servlet-name>debugjsp</servlet-name>
+    <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+    <init-param>
+      <param-name>classdebuginfo</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>debugjsp</servlet-name>
+    <url-pattern>*.jsp</url-pattern>
+  </servlet-mapping>
+以上配置是可以删去的。
+
+用HttpSessionBindingListener接口的监听器必须把监听器实例存入session，监听的是这个监听器实例和session之间的绑定和解绑，而不能监听session中其他对象的创建，替换和删除，编程比较麻烦，因此可以用HttpSessionListener,HttpSessionAttributeListener来做监听器，以下是个简单例子，只要建立了这个监听器文件，就可以对session里所有对象进行监听，并输出对象名和值。用eclipse可以很方便生成这个文件。
+package ccc;
+
+import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+
+@WebListener
+public class bb implements HttpSessionListener, HttpSessionAttributeListener {
+
+    /**
+     * Default constructor. 
+     */
+    public bb() {
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+     * @see HttpSessionListener#sessionCreated(HttpSessionEvent)
+     */
+    public void sessionCreated(HttpSessionEvent arg0)  { 
+         // TODO Auto-generated method stub
+    	System.out.println("sessionCreated"+arg0.getSession().getId());
+    }
+
+	/**
+     * @see HttpSessionListener#sessionDestroyed(HttpSessionEvent)
+     */
+    public void sessionDestroyed(HttpSessionEvent arg0)  { 
+         // TODO Auto-generated method stub
+    	System.out.println("sessionDestroyed");
+    }
+
+	/**
+     * @see HttpSessionAttributeListener#attributeAdded(HttpSessionBindingEvent)
+     */
+    public void attributeAdded(HttpSessionBindingEvent arg0)  { 
+         // TODO Auto-generated method stub
+    	System.out.println("attributeAdded "+arg0.getName()+" "+arg0.getValue());
+    }
+
+	/**
+     * @see HttpSessionAttributeListener#attributeRemoved(HttpSessionBindingEvent)
+     */
+    public void attributeRemoved(HttpSessionBindingEvent arg0)  { 
+         // TODO Auto-generated method stub
+    	System.out.println("attributeRemoved "+arg0.getName()+" "+arg0.getValue());
+    }
+
+	/**
+     * @see HttpSessionAttributeListener#attributeReplaced(HttpSessionBindingEvent)
+     */
+    public void attributeReplaced(HttpSessionBindingEvent arg0)  { 
+         // TODO Auto-generated method stub
+    	System.out.println("attributeReplaced "+arg0.getName()+" "+arg0.getValue());
+    }
+	
+}
+
+监听器可以用来产生在线名单（新建一个session就把一个名字加入全局List里，失效一个session就删去一个名字）；监听器也可以统计在线人数（产生一个session就人数加1，失效一个session就人数减1）。
+以前的网页被访问次数统计的是网站启动以来总访问次数，而不是当前在线人数。一般来说网站的在线人数都不是精确的，而是当前session有效期内这段时间的访问人数，在线名单也一样，并不完全精确。
+
+
+三、servlet3.0新特性
+
+代码9.4使用了servlet3.0的特性，没有用到web.xml。首页提交一些内容，然后用servlet存入数据库。（这个例子需要有sqlserver数据库和jdbc驱动，源码 lib目录下带了针对sqlserver的jdbc驱动）
+
+过滤器也一样，使用servlet3.0里的注释，就不再需要web.xml里的配置。
+
+代码9.5是使用servlet3.0的上传文件的例子。注意所上传文件不在源程序目录里。eclipse环境下tomcat服务器的临时根目录在workspace路径下的.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps，在这个路径下进入该web应用文件夹，里面的upload目录下能找到上传的图片文件。
+
+注意servlet的注释需要如下两个，第二个不能缺少
+@WebServlet("/UploadServlet")
+@MultipartConfig()
+
+String path = this.getServletContext().getRealPath("/");//也就是application.getRealPath("/"),得到的web应用的根目录位置（服务器上的物理位置）
+Part p = request.getPart("file1");  //get
+	
+ApplicationPart ap = (ApplicationPart) p;
+String fname1 = ap.getFilename();	
+这里有可能得到的是客户端完整路径的文件名，也有可能只有文件名（和浏览器有关，不同浏览器传递过来的信息不一样。注意：虽然书上例子用的是ap.getFilename()获取文件名，但其实这种方法在servlet3.0里是不正确的。当浏览器发送的文件名不包含目录时该方法没有问题；但当浏览器发送的文件名包括目录时，如c:\win\a.txt，该方法返回的文件名实测为c:wina.txt，"\"全部丢失，无法获得文件名，因此要改用后面上传多个文件所采用的得到文件名的方法获取真实文件名，否则一些浏览器下会出现问题。）
+int path_idx = fname1.lastIndexOf("\\") + 1;
+String fname2 = fname1.substring(path_idx, fname1.length());
+这两行是取文件名最后一个\的位置（没有\则位置为-1），该位置加1一直到最后取子串，不论以上哪种情况取到的都是不含路径的文件名部分。
+p.write(path + "/upload/" + fname2);//这句就是把文件保存到服务器上，/换成\\也可以。
+
+如果是多用户都可以上传文件，那可以让每个用户有自己的路径（注册用户时创建文件夹），上传的文件保存在自己的目录里防止被他人覆盖，文件命名也可以用 年月日时分秒毫秒，这样避免过去上传的文件被自己覆盖。
+
+如果要在上传文件的同时传递其他信息，比如文本框里的内容
+<form action="UploadServlet" enctype="multipart/form-data" method ="post" >
+ <input type="text" name="user"><br>   
+    选择文件<input type="file" name="file1" id= "file1"/>
+    
+    <input type="submit" name="upload" value="上传" />
+ </form>
+那么接收端除收取文件外，可以用如下代码处理中文（传递文件时必须采用enctype="multipart/form-data" ）
+
+request.setCharacterEncoding("utf-8");//这句必须有，且这里不能用过去提过的另一种办法在后面用转码替代（文本参数转码可以，但提取到的中文文件名转码不好用，只能用这一种方法）
+String user=request.getParameter("user");
+
+
+request.getHeader("Content-Length")能获得本次请求的大小（字符串型），这个大小是本次请求字节的总大小，因为包含文本信息，略大于所有上传文件的总大小，可据此对一次提交的总字节数进行限制从而限制上传文件的大小(大于某个值则不执行保存)。
+
+可以通过表单里放置多个file来一次上传多个文件，也可以用一个file来传多个文件，需要加个
+multiple="multiple"属性（少数旧版本浏览器可能不支持），然后就可以在浏览时按ctrl同时用鼠标选择多个文件进行上传。表单里file型元素如下：
+<form action="UploadServlet" enctype="multipart/form-data" method ="post" >
+ <input type="text" name="user"><br>   
+    选择文件<input type="file" name="file1" id= "file1" multiple="multiple"/>
+    
+    <input type="submit" name="upload" value="上传" />
+ </form>
+
+文本框填写xxxx，以下是我选择两个图片yin4.png和yin5.png上传时用fiddler抓包内容
+POST http://localhost:7000/9.06/UploadServlet HTTP/1.1
+Accept: image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, */*
+Referer: http://localhost:7000/9.06/
+Accept-Language: zh-CN
+Content-Type: multipart/form-data; boundary=---------------------------7e313138a040c
+UA-CPU: AMD64
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0)
+Connection: Keep-Alive
+Content-Length: 42810
+Host: localhost:7000
+Pragma: no-cache
+Cookie: JSESSIONID=3AE4F05A041D4E31C1AC8D616E3B5C13
+
+-----------------------------7e313138a040c
+Content-Disposition: form-data; name="user"
+
+xxxx
+-----------------------------7e313138a040c
+Content-Disposition: form-data; name="file1"; filename="yin4.png"
+Content-Type: image/png
+
+(这里是该文件二进制内容)
+-----------------------------7e313138a040c
+Content-Disposition: form-data; name="file1"; filename="yin5.png"
+Content-Type: image/png
+
+(这里是该文件二进制内容)
+-----------------------------7e313138a040c
+Content-Disposition: form-data; name="upload"
+
+上传
+-----------------------------7e313138a040c--
+
+运行结果是只上传了第一个文件（file1的第一部分），把servlet做如下修改则可以同时保存多个文件。
+package com.mingrisoft;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.util.*;  
+import java.net.*;
+
+import org.apache.catalina.core.ApplicationPart;
+
+/**
+ * Servlet implementation class UploadServlet
+ */
+@WebServlet("/UploadServlet")
+@MultipartConfig()
+public class UploadServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");//这句必须有，且这里不能在后面用转码替代（中文文件名转码也不好用，只能用这一种方法）
+		response.setContentType("text/html;charset=UTF-8");
+		PrintWriter out = response.getWriter();
+		String path = this.getServletContext().getRealPath("/");	//获取服务器地址
+		String user=request.getParameter("user");
+		out.print(user);
+		out.println("<br>");
+		out.write(request.getHeader("Content-Length"));
+		
+		//获取用户选择的上传文件	
+		List<Part> parts = (List<Part>) request.getParts();
+		
+		//循环遍历多个文件
+		for(Part part:parts) {
+			// 获取原文件名，Content-Disposition最后一个等号后面的部分，然后把开头和结尾的引号去掉
+			
+			String header = part.getHeader("Content-Disposition");
+			int start = header.lastIndexOf("=");
+			String fileName = header.substring(start + 1).replace("\"", "");
+			//去掉以下两种情况才是文件数据，才需要存盘
+			//text信息段无 ‘filename=’字样
+            		//file如果为空提交时该段有‘filename=""’字样
+			if ((header.indexOf("filename=")>0) && (!"".equals(fileName))) {
+				
+				part.write(path + "/upload/" + fileName);
+				
+				String urlencodefilename=URLEncoder.encode(fileName,"utf-8");//下载时url中的目录名和文件名要按照utf8做url编码
+				urlencodefilename=urlencodefilename.replace("+", "%20");//url编码把空格变成+，但url目录和文件名里空格需要替换成%20
+				
+				out.println("<br>");
+				out.println("<a href=upload/"+urlencodefilename+">"+fileName+"</a>");
+				
+			}
+		}
+	}
+}
+
+index.jsp也修改成如下：
+<%@page import="java.net.URLEncoder"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+ <form action="UploadServlet" enctype="multipart/form-data" method ="post" >
+ 		<input type="text" name="user"><br>   
+    选择文件	<input type="file" name="file1" id= "file1" multiple="multiple"/>
+    	<input type="submit" name="upload" value="上传" />
+ </form>
+ <%String url="vsftpd 部 分.txt"; //这里随便举了个含中文和空格的文件名
+   String url2=java.net.URLEncoder.encode(url,"utf-8");
+   url2=url2.replace("+", "%20");
+ 
+ %>
+ <a href=upload/<%=url2%>>测试jsp里含空格的中文下载链接，要有这个文件</a>
+</body>
+</html>
+
+server里的server.xml也要加上URIEncoding="UTF-8"，该行如下：
+<Connector connectionTimeout="20000" port="7000" protocol="HTTP/1.1" redirectPort="8443" URIEncoding="UTF-8"/>
+只有server.xml加上URIEncoding="UTF-8"，jsp和servlet才允许中文文件名的下载链接，否则不能下载中文名的链接文件。而且出现在url的路径和文件名要做url编码（utf8的url编码，且空格不能象url出现的参数那样替换成+，而是要替换成%20）
+
+
+上面修改后的例子支持文本信息和多个文件同时上传，而且支持中文名文件的上传，并在上传后提供下载链接。程序里做了这些修改后，还要把server.xml里加上URIEncoding="UTF-8"，这样才能支持文件名里含中文含空格的文件的上传和下载。web开发经常会遇到中文问题，这个例子要认真体会。
+
+
+
+书后题代码9.6演示的是用过滤器对用户提交的内容进行过滤，用****替换指定敏感词。替换后的结果又重新回到了信息录入页显示。过滤器里如何获取request里的参数并进行替换（相当于重写了getParameter方法，在重写的方法里进行了字符串替换），有兴趣的可以学习一下。过滤器可以对整个web应用各种提交都进行过滤（比如用户名，注册信息，留言板，论坛发帖等，所有信息都要流经过滤器），编程上复杂些；也可以针对每种提交各自处理，这样处理的地方多些，但编程上容易理解。
+这个例子整个界面是一张背景图，应该能够自己编程实现类似这样的界面。
+
+书后题代码9.7是用监听器实现服务器本地访问免登录，具体作法是在监听器的request初始化事件里比较客户端和服务器的IP地址，如果一致就在request范围内设置login属性为true。index.jsp里提取request属性会先激发request初始化事件，该事件里通过判断IP为request属性赋值从而激发request属性赋值事件，执行完监听器事件后提取出刚被赋值的request属性，然后据此决定是否跳转到另一页。跳转到下一页引发request属性的销毁。
+
+监听器和过滤器都只对当前web应用有效，而不能对网站上多个web应用同时生效。
+
+监听器监听的是当前web应用request，session，application三大范围内这三种对象本身的创建与销毁，这三个范围内属性值的创建，修改，销毁，编程人员可以为这些事件加上自己的代码。application属于整个网站，request和session则针对每个客户，用sessionid区分不同客户端。request可看做和session类似，但生命周期短，只在页面转发间存在。
+
+监听器最大的作用是监控session的赋值与销毁，从而统计网站在线人数或人员名单 ，其他方面意义不大。
+
+过滤器可用来处理中文问题，不必多个页面都用同样的设置request或response的代码。
+过滤器最明显的应用是判断用户是否登录（通过session）,未登录用户转到登录页，已登录用户放行。
+

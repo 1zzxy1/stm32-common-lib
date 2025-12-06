@@ -1,0 +1,210 @@
+不使用javabean，代码界面混杂，不宜管理维护。
+
+
+package com.aaa;
+
+public class person {
+	private String name="";
+	private int age=0;
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	
+}
+
+
+
+index.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<%
+session.invalidate();//防止缓存,不加这句需要每次重开浏览器进行测试
+%>
+<form action="reg.jsp" method="post">
+		<table align="center" width="400" height="200" border="1">
+			<tr>
+				<td align="center" colspan="2" height="40">
+					<b>添加用户信息</b>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">姓　名：</td>
+				<td>
+					<input type="text" name="name">
+				</td>
+			</tr>
+			<tr>
+				<td align="right">年　龄：</td>
+				<td>
+					<input type="text" name="age">
+				</td>
+			</tr>
+			
+			<tr>
+				<td align="center" colspan="2">
+					<input type="submit" value="添　加">
+				</td>
+			</tr>
+		</table>
+	</form>
+
+</body>
+</html>
+
+
+reg.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="com.aaa.person" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<%
+request.setCharacterEncoding("utf8");
+String name=request.getParameter("name");
+String age=request.getParameter("age");
+
+person man=new person();
+man.setName("name");
+if(age.matches("\\d+")){
+	man.setAge(Integer.parseInt(age));
+}
+
+%>
+<%=man.getName() %><br>
+<%=man.getAge() %><br>
+<%session.setAttribute("man", man); %>
+<a href=reg2.jsp>next page</a>
+</body>
+</html>
+
+
+reg2.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="com.aaa.person" %>    
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<%
+    person man=(person)session.getAttribute("man");
+%>
+<%=man.getName() %><br>
+<%=man.getAge() %><br>
+</body>
+</html>
+
+
+使用javabean后
+
+package com.aaa;
+
+public class person {
+	private String name="";
+	private String age="0";
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getAge() {
+		return age;
+	}
+	public void setAge(String age) {
+		this.age = age;
+	}
+	public void deal(){
+		if(!this.age.matches("\\d+")){
+			this.age="0";
+		}
+	}
+	
+}
+
+
+index.jsp不变
+
+
+
+
+
+reg.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<%
+
+request.setCharacterEncoding("utf8");
+%>
+<jsp:useBean id="man" class="com.aaa.person" scope="session">
+	<jsp:setProperty name="man" property="*"/>
+</jsp:useBean>
+<%
+man.deal();
+%>
+<jsp:getProperty property="name" name="man"/><br>
+<jsp:getProperty property="age" name="man"/><br>
+
+<a href=reg2.jsp>next page</a>
+</body>
+</html>
+
+
+reg2.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="com.aaa.person" %>    
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert  title  here</title>
+</head>
+<body>
+<jsp:useBean id="man" class="com.aaa.person" scope="session">
+</jsp:useBean>
+<jsp:getProperty property="name" name="man"/><br>
+<jsp:getProperty property="age" name="man"/><br>
+</body>
+</html>
+
+
+在reg2.jsp中测试下句位置不同时的是否生效
+<jsp:setProperty property="name" name="man" value="洗衣机"/>
