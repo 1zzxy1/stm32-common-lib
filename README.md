@@ -26,7 +26,7 @@
 | [fft](./fft) | FFT频谱分析，支持THD/SINAD测量 | CMSIS-DSP | 玩信号时用过 |
 | [imu_fusion](./imu_fusion) | IMU九轴融合算法（Madgwick+Kalman） | wp_math(可选) | |
 | [wp_math](./wp_math) | 高性能数学库，100+优化函数（3~10倍提速） | 无 | |
-| [multi_timer](./multi_timer) | 软件定时器管理器（无需RTOS） | 无 | 别的地方抄的 |
+| [multi_timer](./multi_timer) | 软件定时器管理器（无需RTOS） | 无 | 网友那拿的 |
 
 ### ⚙️ 硬件驱动模块（需修改配置）
 
@@ -34,32 +34,32 @@
 
 | 库名 | 说明 | 依赖 | 配置要求 | 来源 |
 |------|------|------|----------|------|
-| [bno08x](./bno08x) | BNO08X九轴IMU驱动（高精度±0.5°） | STM32 HAL | **必须修改UART/I2C接口** | 别的地方抄的 |
-| [jy901s](./jy901s) | JY901S九轴IMU驱动（UART直出角度） | STM32 HAL | **必须修改UART接口** | 别的地方抄的 |
-| [hwt101](./hwt101) | HWT101陀螺仪驱动（带校准） | STM32 HAL | **必须修改UART接口** | 别的地方抄的 |
-| [mpu6050_dmp](./mpu6050_dmp) | MPU6050完整驱动（含DMP固件） | STM32 HAL | **必须修改I2C接口** | 别的地方抄的 |
-| [grayscale](./grayscale) | 8通道灰度传感器驱动（I2C） | STM32 HAL | **必须修改I2C接口** | 别的地方抄的 |
-| [encoder](./encoder) | 编码器驱动库，支持速度测量和位置累计 | STM32 HAL | 修改定时器配置 | 别的地方抄的 |
+| [bno08x](./bno08x) | BNO08X九轴IMU驱动（高精度±0.5°） | STM32 HAL | **必须修改UART/I2C接口** | 网友那拿的 |
+| [jy901s](./jy901s) | JY901S九轴IMU驱动（UART直出角度） | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
+| [hwt101](./hwt101) | HWT101陀螺仪驱动（带校准） | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
+| [mpu6050_dmp](./mpu6050_dmp) | MPU6050完整驱动（含DMP固件） | STM32 HAL | **必须修改I2C接口** | 网友那拿的 |
+| [grayscale](./grayscale) | 8通道灰度传感器驱动（I2C） | STM32 HAL | **必须修改I2C接口** | 网友那拿的 |
+| [encoder](./encoder) | 编码器驱动库，支持速度测量和位置累计 | STM32 HAL | 修改定时器配置 | 网友那拿的 |
 
 #### 电机驱动
 
 | 库名 | 说明 | 依赖 | 配置要求 | 来源 |
 |------|------|------|----------|------|
-| [motor](./motor) | 电机驱动库，支持H桥驱动芯片 | STM32 HAL | 修改PWM定时器配置 | 别的地方抄的 |
-| [emm_v5](./emm_v5) | Emm_V5步进电机串口协议驱动 | STM32 HAL | **必须修改UART接口** | 别的地方抄的 |
-| [tb6612](./tb6612) | TB6612FNG双路DC电机驱动 | STM32 HAL | **必须修改PWM和GPIO配置** | 别的地方抄的 |
-| [a4950](./a4950) | A4950双路DC电机驱动 | STM32 HAL | **必须修改PWM和GPIO配置** | 别的地方抄的 |
+| [motor](./motor) | 电机驱动库，支持H桥驱动芯片 | STM32 HAL | 修改PWM定时器配置 | 网友那拿的 |
+| [emm_v5](./emm_v5) | Emm_V5步进电机串口协议驱动 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
+| [tb6612](./tb6612) | TB6612FNG双路DC电机驱动 | STM32 HAL | **必须修改PWM和GPIO配置** | 网友那拿的 |
+| [a4950](./a4950) | A4950双路DC电机驱动 | STM32 HAL | **必须修改PWM和GPIO配置** | 网友那拿的 |
 
 #### 其他外设
 
 | 库名 | 说明 | 依赖 | 配置要求 | 来源 |
 |------|------|------|----------|------|
-| [ebtn](./ebtn) | 按键驱动库，支持组合键和多击检测 | bit_array | 无硬件依赖 | 别的地方抄的 |
-| [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 HAL | 修改SPI和GPIO配置 | 别的地方抄的 |
-| [spi_flash](./spi_flash) | ⚠️ GD25Qxx SPI Flash驱动 | STM32 HAL | **必须修改CS引脚和SPI句柄** | 别的地方抄的 |
-| [oled](./oled) | ⚠️ SSD1306 OLED显示驱动（基础） | STM32 HAL | **必须修改I2C/SPI接口** | 别的地方抄的 |
-| [waveform_gen](./waveform_gen) | ⚠️ 波形发生器（DAC+DMA+Timer） | STM32 HAL | **必须修改DAC/Timer/DMA句柄** | 别的地方抄的 |
-| [maixcam](./maixcam) | MaixCam视觉传感器串口协议解析 | STM32 HAL | **必须修改UART接口** | 别的地方抄的 |
+| [ebtn](./ebtn) | 按键驱动库，支持组合键和多击检测 | bit_array | 无硬件依赖 | 网友那拿的 |
+| [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 HAL | 修改SPI和GPIO配置 | 网友那拿的 |
+| [spi_flash](./spi_flash) | ⚠️ GD25Qxx SPI Flash驱动 | STM32 HAL | **必须修改CS引脚和SPI句柄** | 网友那拿的 |
+| [oled](./oled) | ⚠️ SSD1306 OLED显示驱动（基础） | STM32 HAL | **必须修改I2C/SPI接口** | 网友那拿的 |
+| [waveform_gen](./waveform_gen) | ⚠️ 波形发生器（DAC+DMA+Timer） | STM32 HAL | **必须修改DAC/Timer/DMA句柄** | 网友那拿的 |
+| [maixcam](./maixcam) | MaixCam视觉传感器串口协议解析 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
 
 ### 📦 第三方开源库
 
@@ -75,7 +75,7 @@
 |------|------|------|----------|------|
 | [shell](./shell) | 🔧 LittleFS命令行Shell | lfs, spi_flash | 文件系统调试 | |
 | [waveform_analyzer](./waveform_analyzer) | 🔧 波形分析器（FFT+谐波） | fft, CMSIS-DSP | **需实现采样率函数** | 玩信号时用过 |
-| [pid_tuner](./pid_tuner) | 🔧 串口命令行PID调参工具 | usart_pack | 实时PID参数调优 | 别的地方抄的 |
+| [pid_tuner](./pid_tuner) | 🔧 串口命令行PID调参工具 | usart_pack | 实时PID参数调优 | 网友那拿的 |
 
 ### 📦 Python工具库（上位机）
 
