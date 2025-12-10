@@ -54,6 +54,10 @@
 - GitHub Issue：https://github.com/1zzxy1/mcu-lib/issues
 - 项目地址：https://github.com/1zzxy1/mcu-lib
 
+### 🔗 友情链接
+
+- [EmbeddedKit](https://github.com/1zzxy1/EmbeddedKit) - 嵌入式组件库（链表/队列/栈/协程/内存池/任务调度）
+
 ## 库列表
 
 ### ✅ 通用算法模块
