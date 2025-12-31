@@ -60,23 +60,40 @@
 
 ## 库列表
 
-### ✅ 通用算法模块
+### ✅ 算法模块
+
+#### 控制算法
 
 | 库名 | 说明 | 平台 | 依赖 | 来源 |
 |------|------|------|------|------|
-| [pid](./pid) | PID控制器，支持位置式和增量式算法 | 通用 | 无 | 忘了哪来的了 |
-| [ringbuffer](./ringbuffer) | 环形缓冲区，适用于串口等数据收发 | 通用 | 无 | 从RT-Thread抄的 |
-| [scheduler](./scheduler) | 任务调度器，基于时间片的非抢占式调度 | 通用 | 无 | 从RTOS抄的 |
-| [kalman](./kalman) | 卡尔曼滤波器，一维信号滤波 | 通用 | 无 | 忘了哪来的了 |
-| [bit_array](./bit_array) | 位数组操作库，Header-only | 通用 | 无 | 忘了哪来的了 |
-| [usart_pack](./usart_pack) | 串口数据包协议，支持多类型打包/解包 | 通用 | 无 | 忘了哪来的了 |
-| [fft](./fft) | FFT频谱分析，支持THD/SINAD测量 | STM32 | CMSIS-DSP | 电赛时用过 |
-| [imu_fusion](./imu_fusion) | IMU九轴融合算法（Madgwick+Kalman） | 通用 | wp_math(可选) | |
-| [wp_math](./wp_math) | 高性能数学库，100+优化函数（3~10倍提速） | 通用 | 无 | |
-| [multi_timer](./multi_timer) | 软件定时器管理器（无需RTOS） | 通用 | 无 | 网友那拿的 |
-| [lq_balance](./lq_balance) | 平衡车控制算法（双闭环PID） | STC16 | LQ系列 | 网友那拿的 |
-| [math_lib](./math_lib) | 数学工具函数（map/Clamp） | 通用 | 无 | 网友那拿的 |
-| [ano_dt](./ano_dt) | 匿名地面站通信协议 | 通用 | 串口 | 学长圣遗物 |
+| [pid](./算法模块/控制算法/pid) | PID控制器，支持位置式和增量式算法 | 通用 | 无 | 忘了哪来的了 |
+| [kalman](./算法模块/控制算法/kalman) | 卡尔曼滤波器，一维信号滤波 | 通用 | 无 | 忘了哪来的了 |
+| [lq_balance](./算法模块/控制算法/lq_balance) | 平衡车控制算法（双闭环PID） | STC16 | LQ系列 | 网友那拿的 |
+
+#### 信号处理
+
+| 库名 | 说明 | 平台 | 依赖 | 来源 |
+|------|------|------|------|------|
+| [fft](./算法模块/信号处理/fft) | FFT频谱分析，支持THD/SINAD测量 | STM32 | CMSIS-DSP | 电赛时用过 |
+| [imu_fusion](./算法模块/信号处理/imu_fusion) | IMU九轴融合算法（Madgwick+Kalman） | 通用 | wp_math(可选) | |
+
+#### 数学库
+
+| 库名 | 说明 | 平台 | 依赖 | 来源 |
+|------|------|------|------|------|
+| [wp_math](./算法模块/数学库/wp_math) | 高性能数学库，100+优化函数（3~10倍提速） | 通用 | 无 | |
+| [math_lib](./算法模块/数学库/math_lib) | 数学工具函数（map/Clamp） | 通用 | 无 | 网友那拿的 |
+
+#### 工具类
+
+| 库名 | 说明 | 平台 | 依赖 | 来源 |
+|------|------|------|------|------|
+| [multi_timer](./算法模块/工具类/multi_timer) | 软件定时器管理器（无需RTOS） | 通用 | 无 | 网友那拿的 |
+| [scheduler](./算法模块/工具类/scheduler) | 任务调度器，基于时间片的非抢占式调度 | 通用 | 无 | 从RTOS抄的 |
+| [bit_array](./算法模块/工具类/bit_array) | 位数组操作库，Header-only | 通用 | 无 | 忘了哪来的了 |
+| [ringbuffer](./算法模块/工具类/ringbuffer) | 环形缓冲区，适用于串口等数据收发 | 通用 | 无 | 从RT-Thread抄的 |
+| [usart_pack](./算法模块/工具类/usart_pack) | 串口数据包协议，支持多类型打包/解包 | 通用 | 无 | 忘了哪来的了 |
+| [ano_dt](./算法模块/工具类/ano_dt) | 匿名地面站通信协议 | 通用 | 串口 | 学长圣遗物 |
 
 ### ⚙️ 硬件驱动模块（需修改配置）
 
@@ -84,168 +101,184 @@
 
 | 库名 | 说明 | 平台 | 依赖 | 配置要求 | 来源 |
 |------|------|------|------|----------|------|
-| [bno08x](./bno08x) | BNO08X九轴IMU驱动（高精度±0.5°） | STM32 | STM32 HAL | **必须修改UART/I2C接口** | 网友那拿的 |
-| [jy901s](./jy901s) | JY901S九轴IMU驱动（UART直出角度） | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
-| [hwt101](./hwt101) | HWT101陀螺仪驱动（带校准） | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
-| [mpu6050_dmp](./mpu6050_dmp) | MPU6050完整驱动（含DMP固件） | STM32 | STM32 HAL | **必须修改I2C接口** | 网友那拿的 |
-| [lq_icm20689](./lq_icm20689) | ICM20689六轴IMU驱动（SPI） | STC16 | LQ_SPI | **必须修改SPI接口** | 网友那拿的 |
-| [grayscale](./grayscale) | 8通道灰度传感器驱动（I2C） | STM32 | STM32 HAL | **必须修改I2C接口** | 网友那拿的 |
-| [encoder](./encoder) | 编码器驱动库，支持速度测量和位置累计 | STM32 | STM32 HAL | 修改定时器配置 | 网友那拿的 |
+| [bno08x](./硬件驱动/传感器/bno08x) | BNO08X九轴IMU驱动（高精度±0.5°） | STM32 | STM32 HAL | **必须修改UART/I2C接口** | 网友那拿的 |
+| [jy901s](./硬件驱动/传感器/jy901s) | JY901S九轴IMU驱动（UART直出角度） | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
+| [hwt101](./硬件驱动/传感器/hwt101) | HWT101陀螺仪驱动（带校准） | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
+| [mpu6050_dmp](./硬件驱动/传感器/mpu6050_dmp) | MPU6050完整驱动（含DMP固件） | STM32 | STM32 HAL | **必须修改I2C接口** | 网友那拿的 |
+| [lq_icm20689](./硬件驱动/传感器/lq_icm20689) | ICM20689六轴IMU驱动（SPI） | STC16 | LQ_SPI | **必须修改SPI接口** | 网友那拿的 |
+| [grayscale](./硬件驱动/传感器/grayscale) | 8通道灰度传感器驱动（I2C） | STM32 | STM32 HAL | **必须修改I2C接口** | 网友那拿的 |
+| [encoder](./硬件驱动/传感器/encoder) | 编码器驱动库，支持速度测量和位置累计 | STM32 | STM32 HAL | 修改定时器配置 | 网友那拿的 |
 
 #### 电机驱动
 
 | 库名 | 说明 | 平台 | 依赖 | 配置要求 | 来源 |
 |------|------|------|------|----------|------|
-| [motor](./motor) | 电机驱动库，支持H桥驱动芯片 | STM32 | STM32 HAL | 修改PWM定时器配置 | 网友那拿的 |
-| [emm_v5](./emm_v5) | Emm_V5步进电机串口协议驱动 | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
-| [tb6612](./tb6612) | TB6612FNG双路DC电机驱动 | STM32 | STM32 HAL | **必须修改PWM和GPIO配置** | 网友那拿的 |
-| [a4950](./a4950) | A4950双路DC电机驱动 | STM32 | STM32 HAL | **必须修改PWM和GPIO配置** | 网友那拿的 |
-| [lq_motorservo](./lq_motorservo) | 龙邱电机舵机驱动（PWM） | STC16 | LQ_PWM | **必须修改PWM接口** | 学长圣遗物 |
+| [motor](./硬件驱动/电机/motor) | 电机驱动库，支持H桥驱动芯片 | STM32 | STM32 HAL | 修改PWM定时器配置 | 网友那拿的 |
+| [emm_v5](./硬件驱动/电机/emm_v5) | Emm_V5步进电机串口协议驱动 | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
+| [tb6612](./硬件驱动/电机/tb6612) | TB6612FNG双路DC电机驱动 | STM32 | STM32 HAL | **必须修改PWM和GPIO配置** | 网友那拿的 |
+| [a4950](./硬件驱动/电机/a4950) | A4950双路DC电机驱动 | STM32 | STM32 HAL | **必须修改PWM和GPIO配置** | 网友那拿的 |
+| [lq_motorservo](./硬件驱动/电机/lq_motorservo) | 龙邱电机舵机驱动（PWM） | STC16 | LQ_PWM | **必须修改PWM接口** | 学长圣遗物 |
+
+#### 显示驱动
+
+| 库名 | 说明 | 平台 | 依赖 | 配置要求 | 来源 |
+|------|------|------|------|----------|------|
+| [oled](./硬件驱动/显示/oled) | ⚠️ SSD1306 OLED显示驱动（基础） | STM32 | STM32 HAL | **必须修改I2C/SPI接口** | 网友那拿的 |
+| [lq_oled096](./硬件驱动/显示/lq_oled096) | 龙邱OLED显示驱动（功能完整） | STC16 | LQ_I2C | **必须修改I2C/SPI接口** | 学长圣遗物 |
+| [u8g2](./硬件驱动/显示/u8g2) | 功能强大的单色图形库 | 通用 | I2C/SPI | **字体库37MB，需裁剪** | 第三方开源 |
+
+#### 存储驱动
+
+| 库名 | 说明 | 平台 | 依赖 | 配置要求 | 来源 |
+|------|------|------|------|----------|------|
+| [spi_flash](./硬件驱动/存储/spi_flash) | ⚠️ GD25Qxx SPI Flash驱动 | STM32 | STM32 HAL | **必须修改CS引脚和SPI句柄** | 网友那拿的 |
+| [gd25qxx](./硬件驱动/存储/gd25qxx) | GD25Qxx SPI Flash驱动（标准协议） | 通用 | SPI外设 | **必须修改CS控制和SPI字节收发** | mcu_-main-board项目 |
+| [sdio_sdcard](./硬件驱动/存储/sdio_sdcard) | SDIO SD卡驱动（完整协议栈） | 通用 | SDIO外设 | **必须适配SDIO寄存器操作** | mcu_-main-board项目 |
 
 #### 其他外设
 
 | 库名 | 说明 | 平台 | 依赖 | 配置要求 | 来源 |
 |------|------|------|------|----------|------|
-| [ebtn](./ebtn) | 按键驱动库，支持组合键和多击检测 | 通用 | bit_array | 无硬件依赖 | 网友那拿的 |
-| [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 | STM32 HAL | 修改SPI和GPIO配置 | 网友那拿的 |
-| [spi_flash](./spi_flash) | ⚠️ GD25Qxx SPI Flash驱动 | STM32 | STM32 HAL | **必须修改CS引脚和SPI句柄** | 网友那拿的 |
-| [gd25qxx](./gd25qxx) | GD25Qxx SPI Flash驱动（标准协议） | 通用 | SPI外设 | **必须修改CS控制和SPI字节收发** | mcu_-main-board项目 |
-| [sdio_sdcard](./sdio_sdcard) | SDIO SD卡驱动（完整协议栈） | 通用 | SDIO外设 | **必须适配SDIO寄存器操作** | mcu_-main-board项目 |
-| [oled](./oled) | ⚠️ SSD1306 OLED显示驱动（基础） | STM32 | STM32 HAL | **必须修改I2C/SPI接口** | 网友那拿的 |
-| [lq_oled096](./lq_oled096) | 龙邱OLED显示驱动（功能完整） | STC16 | LQ_I2C | **必须修改I2C/SPI接口** | 学长圣遗物 |
-| [waveform_gen](./waveform_gen) | ⚠️ 波形发生器（DAC+DMA+Timer） | STM32 | STM32 HAL | **必须修改DAC/Timer/DMA句柄** | 网友那拿的 |
-| [maixcam](./maixcam) | MaixCam视觉传感器串口协议解析 | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
-| [lq_softi2c](./lq_softi2c) | 软件I2C通信库 | 通用 | GPIO | 修改GPIO定义 | 网友那拿的 |
+| [ebtn](./硬件驱动/其他外设/ebtn) | 按键驱动库，支持组合键和多击检测 | 通用 | bit_array | 无硬件依赖 | 网友那拿的 |
+| [ad9833](./硬件驱动/其他外设/ad9833) | AD9833 DDS信号发生器驱动 | STM32 | STM32 HAL | 修改SPI和GPIO配置 | 网友那拿的 |
+| [waveform_gen](./硬件驱动/其他外设/waveform_gen) | ⚠️ 波形发生器（DAC+DMA+Timer） | STM32 | STM32 HAL | **必须修改DAC/Timer/DMA句柄** | 网友那拿的 |
+| [maixcam](./硬件驱动/其他外设/maixcam) | MaixCam视觉传感器串口协议解析 | STM32 | STM32 HAL | **必须修改UART接口** | 网友那拿的 |
+| [lq_softi2c](./硬件驱动/其他外设/lq_softi2c) | 软件I2C通信库 | 通用 | GPIO | 修改GPIO定义 | 网友那拿的 |
 
 ### 📦 第三方开源库
 
 | 库名 | 说明 | 平台 | 依赖 | 注意事项 | 来源 |
 |------|------|------|------|----------|------|
-| [lfs](./lfs) | LittleFS嵌入式文件系统 | 通用 | spi_flash | 需实现硬件读写接口 | 第三方开源 |
-| [u8g2](./u8g2) | 功能强大的单色图形库 | 通用 | I2C/SPI | **字体库37MB，需裁剪** | 第三方开源 |
-| [WouoUI](./WouoUI) | OLED菜单UI框架 | 通用 | u8g2, ebtn | 需要u8g2和按键驱动 | 第三方开源 |
+| [lfs](./第三方库/lfs) | LittleFS嵌入式文件系统 | 通用 | spi_flash | 需实现硬件读写接口 | 第三方开源 |
+| [WouoUI](./第三方库/WouoUI) | OLED菜单UI框架 | 通用 | u8g2, ebtn | 需要u8g2和按键驱动 | 第三方开源 |
 
 ### 🔧 应用层模块（特定场景）
 
 | 库名 | 说明 | 平台 | 依赖 | 使用场景 | 来源 |
 |------|------|------|------|----------|------|
-| [shell](./shell) | 🔧 LittleFS命令行Shell | STM32 | lfs, spi_flash | 文件系统调试 | |
-| [waveform_analyzer](./waveform_analyzer) | 🔧 波形分析器（FFT+谐波） | STM32 | fft, CMSIS-DSP | **需实现采样率函数** | 电赛时用过 |
-| [pid_tuner](./pid_tuner) | 🔧 串口命令行PID调参工具 | STM32 | usart_pack | 实时PID参数调优 | 网友那拿的 |
-| [lcd_menu](./lcd_menu) | 🔧 按键菜单系统 | STM32 | oled, ebtn | 参数调节、功能选择 | 网友那拿的 |
+| [shell](./应用层/shell) | 🔧 LittleFS命令行Shell | STM32 | lfs, spi_flash | 文件系统调试 | |
+| [waveform_analyzer](./应用层/waveform_analyzer) | 🔧 波形分析器（FFT+谐波） | STM32 | fft, CMSIS-DSP | **需实现采样率函数** | 电赛时用过 |
+| [pid_tuner](./应用层/pid_tuner) | 🔧 串口命令行PID调参工具 | STM32 | usart_pack | 实时PID参数调优 | 网友那拿的 |
+| [lcd_menu](./应用层/lcd_menu) | 🔧 按键菜单系统 | STM32 | oled, ebtn | 参数调节、功能选择 | 网友那拿的 |
 
-### 📦 Python工具库（上位机）
+### 🐍 Python工具库（上位机）
 
 | 库名 | 说明 | 平台 | 依赖 | 适用场景 | 来源 |
 |------|------|------|------|----------|------|
-| [simple_uart](./simple_uart) | 完整的Python UART管理库 | PC | pyserial | 上位机串口通信、数据采集 | |
-| [perspective_transform](./perspective_transform) | 图像透视变换工具 | PC | OpenCV, NumPy | 视觉伺服、图像校正 | |
+| [simple_uart](./工具库/Python工具/simple_uart) | 完整的Python UART管理库 | PC | pyserial | 上位机串口通信、数据采集 | |
+| [perspective_transform](./工具库/Python工具/perspective_transform) | 图像透视变换工具 | PC | OpenCV, NumPy | 视觉伺服、图像校正 | |
 
 ### 🐧 Linux/PC开发
 
-#### 网络编程
-
 | 库名 | 说明 | 平台 | 依赖 | 适用场景 | 来源 |
 |------|------|------|------|----------|------|
-| [linux_tcp](./linux_tcp) | TCP服务器客户端（Qt） | Linux/PC | Qt5/Qt6 | 网络通信、物联网、远程控制 | 学长圣遗物 |
+| [linux_tcp](./工具库/Linux工具/linux_tcp) | TCP服务器客户端（Qt） | Linux/PC | Qt5/Qt6 | 网络通信、物联网、远程控制 | 学长圣遗物 |
+| [linux_thread](./工具库/Linux工具/linux_thread) | Qt线程编程示例 | Linux/PC | Qt5/Qt6 | 多线程开发、并发编程 | 学长圣遗物 |
+| [makefile_example](./工具库/Linux工具/makefile_example) | Makefile使用示例 | Linux/PC | GNU Make, GCC | 项目构建、自动化编译 | 学长圣遗物 |
 
-#### 系统编程
-
-| 库名 | 说明 | 平台 | 依赖 | 适用场景 | 来源 |
-|------|------|------|------|----------|------|
-| [linux_thread](./linux_thread) | Qt线程编程示例 | Linux/PC | Qt5/Qt6 | 多线程开发、并发编程 | 学长圣遗物 |
-| [makefile_example](./makefile_example) | Makefile使用示例 | Linux/PC | GNU Make, GCC | 项目构建、自动化编译 | 学长圣遗物 |
-
-### 📚 文档资料（docs/）
+### 📚 文档资料
 
 | 目录 | 说明 | 内容 | 来源 |
 |------|------|------|------|
-| [docs/javaweb](./docs/javaweb) | JavaWeb开发文档 | PDF教材、开发笔记、技术文档 | 学长圣遗物 |
-| [docs/linux_qt](./docs/linux_qt) | Linux与Qt开发文档 | Qt编程教材、实验指导、技术笔记 | 学长圣遗物 |
-| [docs/linux_network](./docs/linux_network) | Linux网络管理文档 | 网络服务配置、系统管理教程 | 学长圣遗物 |
-| [docs/pcb](./docs/pcb) | PCB相关资料 | 原理图、设计参考 | 学长圣遗物 |
+| [docs/javaweb](./资源文档/docs/javaweb) | JavaWeb开发文档 | PDF教材、开发笔记、技术文档 | 学长圣遗物 |
+| [docs/linux_qt](./资源文档/docs/linux_qt) | Linux与Qt开发文档 | Qt编程教材、实验指导、技术笔记 | 学长圣遗物 |
+| [docs/linux_network](./资源文档/docs/linux_network) | Linux网络管理文档 | 网络服务配置、系统管理教程 | 学长圣遗物 |
+| [docs/pcb](./资源文档/docs/pcb) | PCB相关资料 | 原理图、设计参考 | 学长圣遗物 |
 
-### 💡 示例代码（examples/）
-
-| 目录 | 说明 | 内容 | 来源 |
-|------|------|------|------|
-| [examples/javaweb](./examples/javaweb) | JavaWeb代码示例 | Session/Cookie、WebSocket、Excel操作、验证码等 | 学长圣遗物 |
-
-### ⚙️ 配置文件（configs/）
+### 💡 示例代码
 
 | 目录 | 说明 | 内容 | 来源 |
 |------|------|------|------|
-| [configs/dev_tools](./configs/dev_tools) | 开发工具配置 | Claude Code、MCP、Serena、Spec Workflow配置 | 学长圣遗物 |
+| [examples/javaweb](./资源文档/examples/javaweb) | JavaWeb代码示例 | Session/Cookie、WebSocket、Excel操作、验证码等 | 学长圣遗物 |
+
+### ⚙️ 配置文件
+
+| 目录 | 说明 | 内容 | 来源 |
+|------|------|------|------|
+| [configs/dev_tools](./资源文档/configs/dev_tools) | 开发工具配置 | Claude Code、MCP、Serena、Spec Workflow配置 | 学长圣遗物 |
 
 ## 目录结构
 
 ```
 stm32通用库/
-├── # ✅ 通用算法模块
-├── pid/                    # PID控制库
-├── ringbuffer/             # 环形缓冲区
-├── scheduler/              # 任务调度器
-├── kalman/                 # 卡尔曼滤波器
-├── bit_array/              # 位数组库
-├── usart_pack/             # 串口数据包协议
-├── fft/                    # FFT频谱分析
-├── imu_fusion/             # IMU九轴融合算法
-├── wp_math/                # 高性能数学库
-├── multi_timer/            # 软件定时器管理器
+├── 算法模块/                    # 13个算法模块
+│   ├── 控制算法/                # 控制类算法
+│   │   ├── pid/                # PID控制器
+│   │   ├── kalman/             # 卡尔曼滤波器
+│   │   └── lq_balance/         # 平衡车控制算法
+│   ├── 信号处理/                # 信号处理算法
+│   │   ├── fft/                # FFT频谱分析
+│   │   └── imu_fusion/         # IMU九轴融合算法
+│   ├── 数学库/                  # 数学工具库
+│   │   ├── wp_math/            # 高性能数学库
+│   │   └── math_lib/           # 数学工具函数
+│   └── 工具类/                  # 工具类算法
+│       ├── multi_timer/        # 软件定时器管理器
+│       ├── scheduler/          # 任务调度器
+│       ├── bit_array/          # 位数组库
+│       ├── ringbuffer/         # 环形缓冲区
+│       ├── usart_pack/         # 串口数据包协议
+│       └── ano_dt/             # 匿名地面站通信协议
 │
-├── # ⚙️ 硬件驱动模块
-├── # 传感器驱动
-├── bno08x/                 # BNO08X九轴IMU驱动
-├── jy901s/                 # JY901S九轴IMU驱动
-├── hwt101/                 # HWT101陀螺仪驱动
-├── mpu6050_dmp/            # MPU6050完整驱动（含DMP）
-├── grayscale/              # 8通道灰度传感器
-├── encoder/                # 编码器驱动库
+├── 硬件驱动/                    # 23个硬件驱动模块
+│   ├── 传感器/                  # 传感器驱动（7个）
+│   │   ├── bno08x/             # BNO08X九轴IMU驱动
+│   │   ├── jy901s/             # JY901S九轴IMU驱动
+│   │   ├── hwt101/             # HWT101陀螺仪驱动
+│   │   ├── mpu6050_dmp/        # MPU6050完整驱动
+│   │   ├── lq_icm20689/        # ICM20689六轴IMU驱动
+│   │   ├── grayscale/          # 8通道灰度传感器
+│   │   └── encoder/            # 编码器驱动库
+│   ├── 电机/                    # 电机驱动（5个）
+│   │   ├── motor/              # 电机驱动库
+│   │   ├── emm_v5/             # Emm_V5步进电机驱动
+│   │   ├── tb6612/             # TB6612FNG双路DC电机驱动
+│   │   ├── a4950/              # A4950双路DC电机驱动
+│   │   └── lq_motorservo/      # 龙邱电机舵机驱动
+│   ├── 显示/                    # 显示驱动（3个）
+│   │   ├── oled/               # SSD1306 OLED驱动
+│   │   ├── lq_oled096/         # 龙邱OLED显示驱动
+│   │   └── u8g2/               # U8g2图形库
+│   ├── 存储/                    # 存储驱动（3个）
+│   │   ├── spi_flash/          # GD25Qxx SPI Flash驱动
+│   │   ├── gd25qxx/            # GD25Qxx SPI Flash驱动（标准协议）
+│   │   └── sdio_sdcard/        # SDIO SD卡驱动
+│   └── 其他外设/                # 其他外设（5个）
+│       ├── ebtn/               # 按键驱动库
+│       ├── ad9833/             # AD9833 DDS驱动
+│       ├── waveform_gen/       # 波形发生器
+│       ├── maixcam/            # MaixCam视觉传感器协议
+│       └── lq_softi2c/         # 软件I2C通信库
 │
-├── # 电机驱动
-├── motor/                  # 电机驱动库
-├── emm_v5/                 # Emm_V5步进电机驱动
-├── tb6612/                 # TB6612FNG双路DC电机驱动
-├── a4950/                  # A4950双路DC电机驱动
+├── 第三方库/                    # 2个第三方开源库
+│   ├── lfs/                    # LittleFS文件系统
+│   └── WouoUI/                 # WouoUI菜单框架
 │
-├── # 其他外设
-├── ebtn/                   # 按键驱动库
-├── ad9833/                 # AD9833 DDS驱动
-├── spi_flash/              # GD25Qxx SPI Flash驱动
-├── gd25qxx/                # GD25Qxx SPI Flash驱动（标准协议）
-├── sdio_sdcard/            # SDIO SD卡驱动（完整协议栈）
-├── oled/                   # SSD1306 OLED驱动
-├── waveform_gen/           # 波形发生器
-├── maixcam/                # MaixCam视觉传感器协议
+├── 应用层/                      # 4个应用层模块
+│   ├── shell/                  # LittleFS Shell
+│   ├── waveform_analyzer/      # 波形分析器
+│   ├── pid_tuner/              # PID调参工具
+│   └── lcd_menu/               # 按键菜单系统
 │
-├── # 📦 第三方开源库
-├── lfs/                    # LittleFS文件系统
-├── u8g2/                   # U8g2图形库（37MB！）
-├── WouoUI/                 # WouoUI菜单框架
+├── 工具库/                      # 5个工具库
+│   ├── Python工具/              # Python工具（2个）
+│   │   ├── simple_uart/        # Python UART管理库
+│   │   └── perspective_transform/  # 透视变换工具
+│   └── Linux工具/               # Linux/PC工具（3个）
+│       ├── linux_tcp/          # TCP服务器客户端
+│       ├── linux_thread/       # Qt线程编程示例
+│       └── makefile_example/   # Makefile使用示例
 │
-├── # 🔧 应用层模块
-├── shell/                  # LittleFS Shell
-├── waveform_analyzer/      # 波形分析器
-├── pid_tuner/              # PID调参工具
-│
-├── # 📦 Python工具库
-├── simple_uart/            # Python UART管理库
-├── perspective_transform/  # 透视变换工具
-│
-├── # 📚 文档资料
-├── docs/
-│   ├── javaweb/            # JavaWeb开发文档
-│   ├── linux_qt/           # Linux与Qt开发文档
-│   ├── linux_network/      # Linux网络管理文档
-│   └── pcb/                # PCB相关资料
-│
-├── # 💡 示例代码
-├── examples/
-│   └── javaweb/            # JavaWeb代码示例
-│
-├── # ⚙️ 配置文件
-├── configs/
-│   └── dev_tools/          # 开发工具配置（Claude Code、MCP等）
+├── 资源文档/                    # 文档、示例、配置
+│   ├── docs/                   # 文档资料
+│   │   ├── javaweb/            # JavaWeb开发文档
+│   │   ├── linux_qt/           # Linux与Qt开发文档
+│   │   ├── linux_network/      # Linux网络管理文档
+│   │   └── pcb/                # PCB相关资料
+│   ├── examples/               # 示例代码
+│   │   └── javaweb/            # JavaWeb代码示例
+│   └── configs/                # 配置文件
+│       └── dev_tools/          # 开发工具配置
 │
 ├── LICENSE
 └── README.md
