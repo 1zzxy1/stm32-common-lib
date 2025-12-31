@@ -22,7 +22,7 @@
 
 ### 📊 库统计
 
-- **代码模块**：45个（持续增加中）
+- **代码模块**：47个（持续增加中）
 - **文档资料**：4类（JavaWeb、LinuxQt、Linux网络、PCB）
 - **示例代码**：JavaWeb开发示例（10+）
 - **配置文件**：AI开发工具配置
@@ -109,6 +109,8 @@
 | [ebtn](./ebtn) | 按键驱动库，支持组合键和多击检测 | 通用 | bit_array | 无硬件依赖 | 网友那拿的 |
 | [ad9833](./ad9833) | AD9833 DDS信号发生器驱动 | STM32 | STM32 HAL | 修改SPI和GPIO配置 | 网友那拿的 |
 | [spi_flash](./spi_flash) | ⚠️ GD25Qxx SPI Flash驱动 | STM32 | STM32 HAL | **必须修改CS引脚和SPI句柄** | 网友那拿的 |
+| [gd25qxx](./gd25qxx) | GD25Qxx SPI Flash驱动（标准协议） | 通用 | SPI外设 | **必须修改CS控制和SPI字节收发** | mcu_-main-board项目 |
+| [sdio_sdcard](./sdio_sdcard) | SDIO SD卡驱动（完整协议栈） | 通用 | SDIO外设 | **必须适配SDIO寄存器操作** | mcu_-main-board项目 |
 | [oled](./oled) | ⚠️ SSD1306 OLED显示驱动（基础） | STM32 | STM32 HAL | **必须修改I2C/SPI接口** | 网友那拿的 |
 | [lq_oled096](./lq_oled096) | 龙邱OLED显示驱动（功能完整） | STC16 | LQ_I2C | **必须修改I2C/SPI接口** | 学长圣遗物 |
 | [waveform_gen](./waveform_gen) | ⚠️ 波形发生器（DAC+DMA+Timer） | STM32 | STM32 HAL | **必须修改DAC/Timer/DMA句柄** | 网友那拿的 |
@@ -210,6 +212,8 @@ stm32通用库/
 ├── ebtn/                   # 按键驱动库
 ├── ad9833/                 # AD9833 DDS驱动
 ├── spi_flash/              # GD25Qxx SPI Flash驱动
+├── gd25qxx/                # GD25Qxx SPI Flash驱动（标准协议）
+├── sdio_sdcard/            # SDIO SD卡驱动（完整协议栈）
 ├── oled/                   # SSD1306 OLED驱动
 ├── waveform_gen/           # 波形发生器
 ├── maixcam/                # MaixCam视觉传感器协议
@@ -271,8 +275,8 @@ stm32通用库/
 
 ---
 
-**最后更新**：2025-12-07
-**代码模块**：45个
+**最后更新**：2025-12-31
+**代码模块**：47个
 **文档资料**：4类（JavaWeb、LinuxQt、Linux网络、PCB）
 **示例代码**：JavaWeb开发示例10+
 **配置文件**：AI开发工具配置
