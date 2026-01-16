@@ -1,1 +1,189 @@
+# Claude Code相关
 .claude/
+
+# ===== 编译输出 =====
+# C/C++编译产物
+*.o
+*.obj
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.lss
+*.sym
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.d
+*.su
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.ko
+*.mod
+
+# ===== 嵌入式开发 =====
+# Keil MDK
+*.uvgui.*
+*.uvguix.*
+*.uvopt
+*.bak
+*.dep
+*.iex
+JLinkLog.txt
+DebugConfig/
+
+# IAR
+*.eww
+*.dep
+*.dni
+*.wsdt
+*.dnx
+Debug/
+Release/
+
+# STM32CubeIDE / Eclipse
+.metadata/
+.settings/
+.project
+.cproject
+*.launch
+Debug/
+Release/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# ===== IDE配置文件 =====
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sln.docstates
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+
+# CLion / IntelliJ IDEA
+.idea/
+*.iml
+cmake-build-*/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ===== Java =====
+*.class
+*.jar
+*.war
+*.ear
+*.log
+target/
+.gradle/
+build/
+.classpath
+.project
+.settings/
+*.iml
+
+# ===== Qt =====
+# Qt编译产物
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.pro.user
+*.pro.user.*
+object_script.*.Release
+object_script.*.Debug
+Makefile*
+*build-*Qt*-Debug/
+*build-*Qt*-Release/
+
+# ===== 操作系统 =====
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ===== 临时文件 =====
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+
+# ===== 其他 =====
+# 压缩文件（通常不需要版本控制）
+# *.zip
+# *.rar
+# *.7z
+# *.tar.gz
+
+# 大文件（如需要可取消注释）
+# *.pdf
+# *.bin
+# *.hex
